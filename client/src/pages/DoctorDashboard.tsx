@@ -85,7 +85,7 @@ export const DoctorDashboard: React.FC = () => {
         <div className="glass-card backdrop-blur-lg rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="font-heading font-extrabold text-2xl md:text-3xl text-white mb-1">
-              Dr. {user?.name}
+              {user?.name?.startsWith('Dr.') ? user.name : `Dr. ${user?.name}`}
             </h2>
             <div className="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
               <span className="flex items-center gap-1.5 text-primary">

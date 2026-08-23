@@ -115,7 +115,7 @@ export const SymptomModal: React.FC<SymptomModalProps> = ({
               {bookingResult ? 'Appointment Confirmed!' : 'Pre-Visit Symptom Questionnaire'}
             </h3>
             <p className="text-xs text-on-surface-variant mt-0.5">
-              Dr. {doctor.name} • {doctor.specialization}
+              {doctor.name?.startsWith('Dr.') ? doctor.name : `Dr. ${doctor.name}`} • {doctor.specialization}
             </p>
           </div>
           <button

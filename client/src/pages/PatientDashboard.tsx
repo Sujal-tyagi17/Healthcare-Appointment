@@ -540,7 +540,7 @@ export const PatientDashboard: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2.5">
                         <span className="font-heading font-extrabold text-base text-white">
-                          Dr. {apt.doctor?.name}
+                          {apt.doctor?.name?.startsWith('Dr.') ? apt.doctor.name : `Dr. ${apt.doctor?.name}`}
                         </span>
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/25 font-heading">
                           {apt.doctor?.specialization}
