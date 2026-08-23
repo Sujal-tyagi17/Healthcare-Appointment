@@ -14,11 +14,11 @@ import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
 
 const DOCTOR_AVATARS: Record<string, string> = {
-  'Cardiology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxA-yCM8YSW8ygDD4MJq68yFE2umKaU4qry73GCZa44rGXHhk3WjPP-CEkk17AX5hAkpWp3zk9yULOAL9n7PFish_Qx7kjToBrm8nSE6SF_292rDXZZnJvPOsPDFTDWb4TMd93YbCvPTc90mnBID-x6SBEe3q-kJPL5EZDnR86Gc6sxCcB2CNH9Xju8EPWtHa5cSHyU2i_qE7M54gJ4RQNZmV067sXLqFPVDpGVLtycYAmDEN9W083',
-  'Neurology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEgcOnmJ_ovDv3FQ_kr8PuSVx2pwDM4HCOiXITd4laMkHjwjEGF0GlFzRltQRO-mvvhJO7whzUu_59pjJlbcECtguhya0B_5bHkqVMGrPcjTGdj7FtBcF5Zeloso1-xZwfhrpx5bYSlv6gU6tvWfqg2Xe7udgjUVcUjbc7WbK1Ds0hACpmug8JEcgtjx5pA_QwK_7cGAMHdocb93H7jsL0PSQo6lD6Ppb28VEE7twspMdcO3etTZu3',
-  'General Medicine': 'https://lh3.googleusercontent.com/aida-public/AB6AXuAbL4doiu_cLDtDOGmt9-Gu6Zl9kciYdkwFQhobFmctm1biNQqGk67idXE5scngeVWyCvbUG_7Wg_xneVV_vWRmNyAenjWBQE-Juq9GjxDRDS8QlEWDOZO9ZRIoCU6yK2pO5s1REdCP_UVlo6d-TjtUtX0BD-LeZBMpG_Hxv_M3iyZACrTIzZqaCLHQ-HJmbpobAPv8V9npecDZ_FbZW1wA0rKNzCdp0kYVhDWm9FXn6VvbUzNmvYqS',
-  'Pediatrics': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDysuOWTKE1HGSvaZM1vobwe_8CGK0rnsR4jKdMCXrEfTkqm23Gv6RO_JYGpgC3bpEGaTw6YsG6r1VaLV6vrVsdsLd2oznQwOicHvTfi0ga7Maqwh9Qf75cJaeqpeqJqqupclvfeHS0HBdyJgnPWTsXTX63kszbmD_NsQ-5ob3KevGr3KT1MQeEgZnnx2aShqcxPO-kw1F-zdjejfWbVEMxFuFVRoVKUwoVoGr_PCZcb_w2PKxINHV7',
-  'Dermatology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBP5RtuhIa5J95ebHfYTHPzu1bKVteDYvlCdpO3dr7kmAz9YMrpPx93gMfcBNQZbxx8kBx4cwHpS928p6gG8-56iBAC9TFHn6G_fJWHyZJKboBFu7qgRqa3gmxLFUblrcg8NgUaODhNdxM4t2QKSJWPkFIiy0fw_uwlLo6HfeF0hpeeBQTvcFnlTtfYIHzbAivIPpKL7CQ6ZEQPOkMar4wsKkdPs408kJlkaBl1tD79c5zTIj_g1F7n'
+  'Cardiology': 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80',
+  'Neurology': 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80',
+  'General Medicine': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=400&q=80',
+  'Pediatrics': 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80',
+  'Dermatology': 'https://images.unsplash.com/photo-1594824813589-cf77864f7ec6?auto=format&fit=crop&w=400&q=80'
 };
 
 export const PatientDashboard: React.FC = () => {
