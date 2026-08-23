@@ -1,0 +1,20 @@
+{
+  "name": "healthcare-appointment-manager",
+  "version": "1.0.0",
+  "description": "Healthcare Appointment & Follow-up Manager with AI Symptom Triage, Post-Visit Translation, Google Calendar Sync, and Automated Reminders",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "build": "npm run build:client && npm run build:server",
+    "start": "npm run start --prefix server",
+    "seed": "npm run prisma:seed --prefix server",
+    "test": "npm run test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
