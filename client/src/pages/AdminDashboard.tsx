@@ -330,7 +330,7 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 font-heading font-bold text-white">
-                        ${doc.consultationFee}.00
+                        ₹{doc.consultationFee}.00
                       </td>
                       <td className="py-3.5 px-4 text-on-surface-variant">
                         {doc.slotDurationMinutes} min
@@ -526,7 +526,7 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block font-heading font-semibold text-on-surface-variant mb-1">Fee ($ / visit)</label>
+                  <label className="block font-heading font-semibold text-on-surface-variant mb-1">Fee (₹ / visit)</label>
                   <input
                     type="number"
                     value={newDoctor.consultationFee}

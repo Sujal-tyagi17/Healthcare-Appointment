@@ -307,7 +307,7 @@ export const PatientDashboard: React.FC = () => {
                         <div className="flex items-center justify-between py-2.5 border-y border-outline-variant/20 text-xs text-on-surface-variant">
                           <div className="flex items-center gap-1.5">
                             <span className="material-symbols-outlined text-sm text-primary">payments</span>
-                            <span className="text-white font-heading font-bold">${doc.consultationFee} / visit</span>
+                            <span className="text-white font-heading font-bold">₹{doc.consultationFee} / visit</span>
                           </div>
                           <div className="w-px h-4 bg-outline-variant/30"></div>
                           <div className="flex items-center gap-1.5">

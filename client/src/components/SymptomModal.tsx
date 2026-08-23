@@ -135,7 +135,7 @@ export const SymptomModal: React.FC<SymptomModalProps> = ({
                 <div>
                   <span className="font-semibold text-on-surface-variant">Selected Slot: </span>
                   <span className="font-bold text-primary font-heading">{date} at {slot.startTime} - {slot.endTime}</span>
-                  <p className="text-on-surface-variant/80 mt-1">{doctor.roomNumber || 'Room 101'} • Consultation Fee: ${doctor.consultationFee}</p>
+                  <p className="text-on-surface-variant/80 mt-1">{doctor.roomNumber || 'Room 101'} • Consultation Fee: ₹{doctor.consultationFee}</p>
                 </div>
                 <div className="flex items-center gap-1.5 bg-surface-container-high px-3 py-1.5 rounded-xl border border-primary/40 shadow-neon-cyan">
                   <Clock className="w-3.5 h-3.5 text-primary animate-spin" />

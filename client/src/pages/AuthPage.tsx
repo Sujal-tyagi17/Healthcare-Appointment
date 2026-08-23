@@ -289,7 +289,7 @@ export const AuthPage: React.FC = () => {
                     <p className="text-xs font-semibold text-on-surface group-hover:text-primary transition-colors font-heading">
                       Patient Portal
                     </p>
-                    <p className="text-[11px] text-on-surface-variant">John Doe (Patient Demo)</p>
+                    <p className="text-[11px] text-on-surface-variant">Rahul Sharma (Patient Demo)</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity text-base">
@@ -310,7 +310,7 @@ export const AuthPage: React.FC = () => {
                     <p className="text-xs font-semibold text-on-surface group-hover:text-secondary transition-colors font-heading">
                       Doctor Clinical Station
                     </p>
-                    <p className="text-[11px] text-on-surface-variant">Dr. Sarah Jenkins — Cardiology</p>
+                    <p className="text-[11px] text-on-surface-variant">Dr. Rajesh Sharma — Cardiology</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity text-base">

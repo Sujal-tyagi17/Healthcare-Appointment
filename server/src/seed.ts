@@ -22,76 +22,76 @@ async function main() {
   // 1. Create Admin
   const admin = await prisma.user.create({
     data: {
-      name: 'Clinic Administrator',
+      name: 'CarePulse Clinic Administrator',
       email: 'admin@carepulse.com',
       password: adminPasswordHash,
       role: 'ADMIN',
-      phone: '+1 (555) 010-0001'
+      phone: '+91 98765 43210'
     }
   });
   console.log(`✅ Created Admin: ${admin.email}`);
 
-  // 2. Create Doctors
+  // 2. Create Doctors with Indian Names & Consultation Fees in INR
   const doctorsData = [
     {
-      name: 'Dr. Sarah Jenkins',
-      email: 'dr.sarah@carepulse.com',
+      name: 'Dr. Rajesh Sharma',
+      email: 'dr.rajesh@carepulse.com',
       specialization: 'Cardiology',
-      bio: 'Board-certified cardiologist specializing in preventive cardiology, hypertension, and coronary artery disease management with over 14 years of clinical experience.',
+      bio: 'Senior Consultant Cardiologist specializing in preventive cardiology, hypertension, angiography, and heart rhythm management with over 15 years of clinical practice.',
       slotDurationMinutes: 30,
       workingHoursStart: '09:00',
       workingHoursEnd: '17:00',
-      consultationFee: 75.0,
+      consultationFee: 1200.0,
       roomNumber: 'Suite 201 (Cardiology Wing)',
-      phone: '+1 (555) 010-1001'
+      phone: '+91 98111 22334'
     },
     {
-      name: 'Dr. Marcus Chen',
-      email: 'dr.marcus@carepulse.com',
+      name: 'Dr. Ananya Iyer',
+      email: 'dr.ananya@carepulse.com',
       specialization: 'Dermatology',
-      bio: 'Specialist in clinical and aesthetic dermatology, focusing on acne management, eczema, psoriasis, and early skin lesion detection.',
+      bio: 'Leading clinical dermatologist focusing on acne therapy, eczema, psoriasis, skin allergies, and advanced laser dermatological care.',
       slotDurationMinutes: 20,
       workingHoursStart: '09:00',
       workingHoursEnd: '16:00',
-      consultationFee: 60.0,
-      roomNumber: 'Suite 105 (Dermatology Clinic)',
-      phone: '+1 (555) 010-1002'
+      consultationFee: 800.0,
+      roomNumber: 'Suite 105 (Dermatology & Skin Care)',
+      phone: '+91 98222 33445'
     },
     {
-      name: 'Dr. Emily Rodriguez',
-      email: 'dr.emily@carepulse.com',
+      name: 'Dr. Vikram Malhotra',
+      email: 'dr.vikram@carepulse.com',
       specialization: 'Neurology',
-      bio: 'Fellowship-trained neurologist with expertise in chronic migraines, peripheral neuropathy, cognitive disorders, and sleep disturbances.',
+      bio: 'Chief Neurologist with clinical expertise in migraine management, neuropathic pain, epilepsy, and cognitive neurological health.',
       slotDurationMinutes: 45,
       workingHoursStart: '10:00',
       workingHoursEnd: '18:00',
-      consultationFee: 90.0,
-      roomNumber: 'Suite 310 (Neuroscience Center)',
-      phone: '+1 (555) 010-1003'
+      consultationFee: 1500.0,
+      roomNumber: 'Suite 310 (Neurosciences Center)',
+      phone: '+91 98333 44556'
     },
     {
-      name: 'Dr. Alex Thompson',
-      email: 'dr.alex@carepulse.com',
+      name: 'Dr. Amit Verma',
+      email: 'dr.amit@carepulse.com',
       specialization: 'General Medicine',
-      bio: 'Primary care physician committed to comprehensive health assessments, chronic disease management, and preventative wellness screenings.',
+      bio: 'Experienced General Physician dedicated to comprehensive annual health checks, diabetes care, and lifestyle disease management.',
       slotDurationMinutes: 30,
       workingHoursStart: '08:30',
       workingHoursEnd: '16:30',
-      consultationFee: 50.0,
-      roomNumber: 'Room 102 (Family Practice)',
-      phone: '+1 (555) 010-1004'
+      consultationFee: 500.0,
+      roomNumber: 'Room 102 (OPD Practice)',
+      phone: '+91 98444 55667'
     },
     {
       name: 'Dr. Priya Patel',
       email: 'dr.priya@carepulse.com',
       specialization: 'Pediatrics',
-      bio: 'Dedicated pediatrician providing gentle and compassionate care from newborn health checks to adolescent developmental screenings.',
+      bio: 'Compassionate Pediatrician specializing in infant growth tracking, immunization schedules, childhood respiratory wellness, and nutrition.',
       slotDurationMinutes: 30,
       workingHoursStart: '09:00',
       workingHoursEnd: '15:00',
-      consultationFee: 55.0,
+      consultationFee: 700.0,
       roomNumber: 'Suite 108 (Pediatrics Wing)',
-      phone: '+1 (555) 010-1005'
+      phone: '+91 98555 66778'
     }
   ];
 
@@ -119,29 +119,41 @@ async function main() {
       include: { doctorProfile: true }
     });
     createdDoctors.push(user);
-    console.log(`✅ Created Doctor: ${user.name} (${doc.specialization})`);
+    console.log(`✅ Created Doctor: ${user.name} (${doc.specialization}) - ₹${doc.consultationFee}`);
   }
 
   // 3. Create Patients
   const patient1 = await prisma.user.create({
     data: {
+      name: 'Rahul Sharma',
+      email: 'rahul@example.com',
+      password: passwordHash,
+      role: 'PATIENT',
+      phone: '+91 98760 11223'
+    }
+  });
+
+  // Also create john@example.com for legacy demo compatibility
+  await prisma.user.create({
+    data: {
       name: 'John Doe',
       email: 'john@example.com',
       password: passwordHash,
       role: 'PATIENT',
-      phone: '+1 (555) 902-1234'
+      phone: '+91 98760 11224'
     }
   });
 
   const patient2 = await prisma.user.create({
     data: {
-      name: 'Alice Smith',
-      email: 'alice@example.com',
+      name: 'Pooja Verma',
+      email: 'pooja@example.com',
       password: passwordHash,
       role: 'PATIENT',
-      phone: '+1 (555) 902-5678'
+      phone: '+91 98760 33445'
     }
   });
+
   console.log(`✅ Created Patients: ${patient1.name}, ${patient2.name}`);
 
   // 4. Create Sample Past Completed Appointment with AI Pre and Post Summaries
@@ -151,12 +163,12 @@ async function main() {
   const completedApt = await prisma.appointment.create({
     data: {
       patientId: patient1.id,
-      doctorId: createdDoctors[0].id, // Dr. Sarah Jenkins (Cardiology)
+      doctorId: createdDoctors[0].id, // Dr. Rajesh Sharma (Cardiology)
       date: todayStr,
       startTime: '09:00',
       endTime: '09:30',
       status: 'COMPLETED',
-      symptoms: 'Experiencing recurrent palpitations during evening workouts, slight chest tightness when climbing stairs, and occasional dizziness.'
+      symptoms: 'Experiencing recurrent palpitations during evening walks, mild chest tightness when climbing stairs, and occasional dizziness.'
     }
   });
 
@@ -167,8 +179,8 @@ async function main() {
       chiefComplaint: 'Recurrent exertional palpitations and mild chest tightness with stairs.',
       suggestedQuestions: JSON.stringify([
         'How long do the palpitations typically last and do they resolve with rest?',
-        'Have you noticed any shortness of breath, lightheadedness, or swelling in your ankles?',
-        'Do you consume high amounts of caffeine, pre-workout supplements, or energy drinks?'
+        'Have you noticed any shortness of breath, lightheadedness, or swelling in your feet?',
+        'Do you consume high amounts of tea/coffee, energy drinks, or stress stimulants?'
       ]),
       rawResponse: 'Seeded AI analysis'
     }
@@ -180,7 +192,7 @@ async function main() {
       dosage: '25mg',
       frequency: 'Twice daily',
       durationDays: 14,
-      instructions: 'Take 1 tablet in the morning and 1 in the evening with food.',
+      instructions: 'Take 1 tablet in the morning and 1 in the evening after meals.',
       reminderTimes: ['09:00', '21:00']
     },
     {
@@ -188,7 +200,7 @@ async function main() {
       dosage: '100mg',
       frequency: 'Once daily',
       durationDays: 30,
-      instructions: 'Take with lunch.',
+      instructions: 'Take after lunch with water.',
       reminderTimes: ['13:00']
     }
   ];
@@ -196,10 +208,10 @@ async function main() {
   await prisma.postVisitSummary.create({
     data: {
       appointmentId: completedApt.id,
-      clinicalNotes: 'ECG demonstrates normal sinus rhythm with occasional benign PVCs. Blood pressure elevated at 138/88 mmHg. Commenced low-dose beta-blocker to stabilize rate. Holter monitor scheduled for next week.',
+      clinicalNotes: 'ECG demonstrates normal sinus rhythm with occasional benign PVCs. Blood pressure elevated at 138/88 mmHg. Low-dose beta-blocker prescribed. Holter monitor scheduled for next week.',
       prescriptionJson: JSON.stringify(prescriptions),
       patientFriendlySummary: 'Your heart examination showed mild irregular beats during physical exertion, which are common and treatable. We have prescribed a gentle heart medication (Metoprolol) to keep your pulse steady and relieve chest tightness. Please monitor your blood pressure daily.',
-      followUpSteps: '1. Take Metoprolol twice daily with meals.\n2. Avoid intense cardio workouts and high caffeine for 1 week.\n3. Wear the 24-hour Holter monitor when picked up on Friday.\n4. Return for follow-up in 2 weeks.'
+      followUpSteps: '1. Take Metoprolol twice daily after meals.\n2. Avoid heavy exertion and high caffeine for 1 week.\n3. Return for clinical review in 2 weeks.'
     }
   });
 
@@ -221,17 +233,17 @@ async function main() {
     });
   }
 
-  // 5. Create Sample Upcoming Booked Appointment for Alice
+  // 5. Create Sample Upcoming Booked Appointment for Pooja
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
   const upcomingApt = await prisma.appointment.create({
     data: {
       patientId: patient2.id,
-      doctorId: createdDoctors[1].id, // Dr. Marcus Chen (Dermatology)
+      doctorId: createdDoctors[1].id, // Dr. Ananya Iyer (Dermatology)
       date: tomorrow,
       startTime: '10:00',
       endTime: '10:20',
       status: 'BOOKED',
-      symptoms: 'Persistent dry, itchy rash across both inner elbows for the past 3 weeks. OTC hydrocortisone gives temporary relief only.'
+      symptoms: 'Persistent dry, itchy skin rash across both inner elbows for the past 3 weeks. OTC creams give temporary relief only.'
     }
   });
 
@@ -239,11 +251,11 @@ async function main() {
     data: {
       appointmentId: upcomingApt.id,
       urgencyLevel: 'LOW',
-      chiefComplaint: 'Subacute erythematous pruritic rash on flexural elbows refractory to OTC steroids.',
+      chiefComplaint: 'Subacute erythematous pruritic rash on flexural elbows refractory to OTC creams.',
       suggestedQuestions: JSON.stringify([
         'Have you switched soaps, detergents, cosmetics, or clothing fabrics recently?',
-        'Does the itching intensify at night or after hot showers?',
-        'Do you have a personal or family history of atopic eczema, asthma, or seasonal allergies?'
+        'Does the itching intensify at night or during hot humid weather?',
+        'Do you have a family history of atopic eczema, asthma, or skin allergies?'
       ]),
       rawResponse: 'Seeded AI analysis'
     }
@@ -252,11 +264,15 @@ async function main() {
   console.log('🎉 Database seeded successfully!');
   console.log('----------------------------------------------------');
   console.log('Demo Credentials:');
-  console.log('👑 Admin:   admin@carepulse.com    / admin123');
-  console.log('🩺 Doctor:  dr.sarah@carepulse.com / doctor123');
-  console.log('🩺 Doctor:  dr.marcus@carepulse.com/ doctor123');
-  console.log('👤 Patient: john@example.com       / password123');
-  console.log('👤 Patient: alice@example.com      / password123');
+  console.log('👑 Admin:   admin@carepulse.com     / admin123');
+  console.log('🩺 Doctor:  dr.rajesh@carepulse.com / doctor123 (Cardiology - ₹1,200)');
+  console.log('🩺 Doctor:  dr.ananya@carepulse.com / doctor123 (Dermatology - ₹800)');
+  console.log('🩺 Doctor:  dr.vikram@carepulse.com / doctor123 (Neurology - ₹1,500)');
+  console.log('🩺 Doctor:  dr.amit@carepulse.com   / doctor123 (General Med - ₹500)');
+  console.log('🩺 Doctor:  dr.priya@carepulse.com  / doctor123 (Pediatrics - ₹700)');
+  console.log('👤 Patient: rahul@example.com       / password123');
+  console.log('👤 Patient: pooja@example.com       / password123');
+  console.log('👤 Patient: john@example.com        / password123');
   console.log('----------------------------------------------------');
 }
 
