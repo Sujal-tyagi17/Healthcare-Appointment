@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { DoctorListItem, NotificationLogItem } from '../types';
+import { AIInsightsModal } from '../components/AIInsightsModal';
 import { Sidebar } from '../components/Sidebar';
 import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
@@ -15,6 +16,7 @@ const DOCTOR_AVATARS: Record<string, string> = {
 
 export const AdminDashboard: React.FC = () => {
   const [navTab, setNavTab] = useState<'Dashboard' | 'Schedule' | 'Records' | 'Settings'>('Dashboard');
+  const [showAIModal, setShowAIModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Stats State
@@ -154,13 +156,18 @@ export const AdminDashboard: React.FC = () => {
       <FluidShaderCanvas />
 
       {/* Side Navigation Bar */}
-      <Sidebar activeTab={navTab} onTabChange={(tab) => setNavTab(tab as any)} />
+      <Sidebar
+        activeTab={navTab}
+        onTabChange={(tab) => setNavTab(tab as any)}
+        onOpenAIInsights={() => setShowAIModal(true)}
+      />
 
       {/* Top App Bar */}
       <TopAppBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         title="Clinic Administration"
+        onOpenAIInsights={() => setShowAIModal(true)}
       />
 
       {/* Main Content */}
@@ -647,6 +654,11 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI Platform Intelligence Modal */}
+      {showAIModal && (
+        <AIInsightsModal onClose={() => setShowAIModal(false)} />
       )}
     </div>
   );

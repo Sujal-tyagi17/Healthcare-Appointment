@@ -4,11 +4,13 @@ import { useAuth } from '../context/AuthContext';
 interface SidebarProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  onOpenAIInsights?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab = 'Dashboard',
-  onTabChange
+  onTabChange,
+  onOpenAIInsights
 }) => {
   const { user, logout } = useAuth();
 
@@ -59,7 +61,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Role & Footer CTA */}
       <div className="p-4 border-t border-outline-variant/20 space-y-3">
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container hover:bg-surface-container-high transition-all duration-200 rounded-xl border border-outline-variant/40 group ai-gradient-border">
+        <button
+          onClick={onOpenAIInsights}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container hover:bg-surface-container-high transition-all duration-200 rounded-xl border border-outline-variant/40 group ai-gradient-border"
+        >
           <span className="material-symbols-outlined text-secondary text-base group-hover:scale-110 transition-transform">
             auto_awesome
           </span>

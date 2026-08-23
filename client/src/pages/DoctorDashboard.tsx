@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { Appointment } from '../types';
 import { PrescriptionModal } from '../components/PrescriptionModal';
+import { AIInsightsModal } from '../components/AIInsightsModal';
 import { Sidebar } from '../components/Sidebar';
 import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
@@ -10,6 +11,7 @@ import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
 export const DoctorDashboard: React.FC = () => {
   const { user } = useAuth();
   const [navTab, setNavTab] = useState<'Dashboard' | 'Schedule' | 'Records' | 'Settings'>('Dashboard');
+  const [showAIModal, setShowAIModal] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -63,13 +65,18 @@ export const DoctorDashboard: React.FC = () => {
       <FluidShaderCanvas />
 
       {/* Side Navigation Bar */}
-      <Sidebar activeTab={navTab} onTabChange={(tab) => setNavTab(tab as any)} />
+      <Sidebar
+        activeTab={navTab}
+        onTabChange={(tab) => setNavTab(tab as any)}
+        onOpenAIInsights={() => setShowAIModal(true)}
+      />
 
       {/* Top App Bar */}
       <TopAppBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         title="Doctor Clinical Station"
+        onOpenAIInsights={() => setShowAIModal(true)}
       />
 
       {/* Main Content Area */}
@@ -324,6 +331,11 @@ export const DoctorDashboard: React.FC = () => {
             fetchAppointments();
           }}
         />
+      )}
+
+      {/* AI Clinical Intelligence & Diagnostics Insights Modal */}
+      {showAIModal && (
+        <AIInsightsModal onClose={() => setShowAIModal(false)} />
       )}
     </div>
   );

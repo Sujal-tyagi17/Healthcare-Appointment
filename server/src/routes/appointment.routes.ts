@@ -447,4 +447,26 @@ router.get('/:id/ics', requireAuth, async (req, res) => {
   }
 });
 
+// Real-time AI Symptom Analysis Endpoint
+router.post('/analyze-symptoms', requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { symptoms } = req.body;
+    if (!symptoms || typeof symptoms !== 'string') {
+      return res.status(400).json({ success: false, message: 'Symptoms description is required.' });
+    }
+
+    const analysis = await generatePreVisitSummary(symptoms);
+    return res.json({
+      success: true,
+      analysis: {
+        urgencyLevel: analysis.urgencyLevel,
+        chiefComplaint: analysis.chiefComplaint,
+        suggestedQuestions: analysis.suggestedQuestions
+      }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 export default router;

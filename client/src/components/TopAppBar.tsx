@@ -5,12 +5,14 @@ interface TopAppBarProps {
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
   title?: string;
+  onOpenAIInsights?: () => void;
 }
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({
   searchQuery = '',
   onSearchChange,
-  title = 'CarePulse'
+  title = 'CarePulse',
+  onOpenAIInsights
 }) => {
   const { user } = useAuth();
 
@@ -44,6 +46,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
         </button>
 
         <button
+          onClick={onOpenAIInsights}
           className="w-9 h-9 rounded-full flex items-center justify-center text-secondary hover:text-white hover:bg-white/5 transition-all"
           title="AI Assistant"
         >

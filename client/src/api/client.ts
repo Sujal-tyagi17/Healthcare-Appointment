@@ -210,5 +210,15 @@ export const api = {
       headers: getHeaders()
     });
     return handleResponse(res);
+  },
+
+  // Real-time AI Symptom Analysis
+  async analyzeSymptoms(symptoms: string): Promise<{ analysis: { urgencyLevel: 'LOW' | 'MEDIUM' | 'HIGH'; chiefComplaint: string; suggestedQuestions: string[] } }> {
+    const res = await fetch(`${API_BASE}/appointments/analyze-symptoms`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ symptoms })
+    });
+    return handleResponse(res);
   }
 };

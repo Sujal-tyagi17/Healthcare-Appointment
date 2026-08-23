@@ -8,6 +8,7 @@ import {
   MedicationReminderItem
 } from '../types';
 import { SymptomModal } from '../components/SymptomModal';
+import { AIInsightsModal } from '../components/AIInsightsModal';
 import { Sidebar } from '../components/Sidebar';
 import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
@@ -23,6 +24,7 @@ const DOCTOR_AVATARS: Record<string, string> = {
 export const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
   const [navTab, setNavTab] = useState<'Dashboard' | 'Schedule' | 'Records' | 'Settings'>('Dashboard');
+  const [showAIModal, setShowAIModal] = useState(false);
 
   // Booking & Specialist State
   const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
@@ -169,13 +171,18 @@ export const PatientDashboard: React.FC = () => {
       <FluidShaderCanvas />
 
       {/* Side Navigation Bar */}
-      <Sidebar activeTab={navTab} onTabChange={(tab) => setNavTab(tab as any)} />
+      <Sidebar
+        activeTab={navTab}
+        onTabChange={(tab) => setNavTab(tab as any)}
+        onOpenAIInsights={() => setShowAIModal(true)}
+      />
 
       {/* Top App Bar */}
       <TopAppBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         title="Patient Portal"
+        onOpenAIInsights={() => setShowAIModal(true)}
       />
 
       {/* Main Canvas Area */}
@@ -651,6 +658,11 @@ export const PatientDashboard: React.FC = () => {
             refreshUserData();
           }}
         />
+      )}
+
+      {/* AI Clinical Intelligence & Symptom Insights Modal */}
+      {showAIModal && (
+        <AIInsightsModal onClose={() => setShowAIModal(false)} />
       )}
     </div>
   );
