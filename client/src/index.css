@@ -15,22 +15,93 @@
 }
 
 .glass-card {
-  background: rgba(19, 27, 46, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(11, 19, 38, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(14, 165, 233, 0.35);
-  box-shadow: 0 12px 30px -10px rgba(14, 165, 233, 0.15);
+  border-color: rgba(137, 206, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .glass-panel {
-  background: rgba(23, 31, 51, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-gradient-text, .gradient-text-ai {
+  background: linear-gradient(135deg, #d0bcff 0%, #89ceff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-gradient-border {
+  position: relative;
+}
+
+.ai-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(87, 27, 193, 0.5), rgba(14, 165, 233, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.lift-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.lift-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  background-color: rgba(45, 52, 73, 0.5);
+}
+
+.floating-input {
+  position: relative;
+}
+
+.floating-input input {
+  padding: 1.5rem 1rem 0.5rem;
+}
+
+.floating-input label {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+  color: #bec8d2;
+}
+
+.floating-input input:focus + label,
+.floating-input input:not(:placeholder-shown) + label {
+  top: 0.5rem;
+  transform: translateY(0) scale(0.85);
+  transform-origin: left top;
+  color: #89ceff;
+}
+
+.role-pill {
+  transition: all 0.3s ease;
+}
+
+.role-pill.active {
+  background: rgba(14, 165, 233, 0.15);
+  color: #89ceff;
+  border-color: #89ceff;
 }
 
 .ai-gradient-card {
@@ -48,6 +119,15 @@
 .ai-gradient-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px -4px rgba(139, 92, 246, 0.4);
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar, .scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom clinical scrollbar */

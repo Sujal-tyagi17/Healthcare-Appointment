@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from './context/AuthContext';
-import { Navbar } from './components/Navbar';
 import { DemoBanner } from './components/DemoBanner';
 import { AuthPage } from './pages/AuthPage';
 import { PatientDashboard } from './pages/PatientDashboard';
@@ -13,7 +12,7 @@ export const App: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0b1326] flex flex-col items-center justify-center text-white space-y-4">
-        <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin shadow-neon-cyan" />
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-neon-cyan" />
         <p className="text-sm font-semibold tracking-wide text-on-surface-variant font-heading">
           Loading CarePulse Healthcare Platform...
         </p>
@@ -26,20 +25,15 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1326] flex flex-col text-[#dae2fd] relative selection:bg-primary-container selection:text-white">
-      {/* Subtle Background Glow Elements */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary-container/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-secondary-container/15 rounded-full blur-3xl pointer-events-none -z-10" />
+    <div className="min-h-screen bg-background text-on-background selection:bg-primary-container selection:text-white">
+      {/* Floating Demo Role Switcher at the bottom-right */}
+      <div className="fixed bottom-4 right-4 z-50 shadow-2xl rounded-2xl overflow-hidden border border-white/15 backdrop-blur-2xl">
+        <DemoBanner />
+      </div>
 
-      <DemoBanner />
-      <Navbar />
-
-      <main className="flex-1 pb-16">
-        {user.role === 'PATIENT' && <PatientDashboard />}
-        {user.role === 'DOCTOR' && <DoctorDashboard />}
-        {user.role === 'ADMIN' && <AdminDashboard />}
-      </main>
+      {user.role === 'PATIENT' && <PatientDashboard />}
+      {user.role === 'DOCTOR' && <DoctorDashboard />}
+      {user.role === 'ADMIN' && <AdminDashboard />}
     </div>
   );
 };
-

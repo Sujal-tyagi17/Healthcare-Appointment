@@ -8,33 +8,34 @@ import {
   MedicationReminderItem
 } from '../types';
 import { SymptomModal } from '../components/SymptomModal';
-import {
-  Search,
-  Calendar as CalendarIcon,
-  Clock,
-  Pill,
-  History,
-  Sparkles,
-  AlertCircle,
-  Download,
-  CheckCircle,
-  CalendarCheck,
-  ChevronRight
-} from 'lucide-react';
+import { Sidebar } from '../components/Sidebar';
+import { TopAppBar } from '../components/TopAppBar';
+import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
+
+const DOCTOR_AVATARS: Record<string, string> = {
+  'Cardiology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxA-yCM8YSW8ygDD4MJq68yFE2umKaU4qry73GCZa44rGXHhk3WjPP-CEkk17AX5hAkpWp3zk9yULOAL9n7PFish_Qx7kjToBrm8nSE6SF_292rDXZZnJvPOsPDFTDWb4TMd93YbCvPTc90mnBID-x6SBEe3q-kJPL5EZDnR86Gc6sxCcB2CNH9Xju8EPWtHa5cSHyU2i_qE7M54gJ4RQNZmV067sXLqFPVDpGVLtycYAmDEN9W083',
+  'Neurology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEgcOnmJ_ovDv3FQ_kr8PuSVx2pwDM4HCOiXITd4laMkHjwjEGF0GlFzRltQRO-mvvhJO7whzUu_59pjJlbcECtguhya0B_5bHkqVMGrPcjTGdj7FtBcF5Zeloso1-xZwfhrpx5bYSlv6gU6tvWfqg2Xe7udgjUVcUjbc7WbK1Ds0hACpmug8JEcgtjx5pA_QwK_7cGAMHdocb93H7jsL0PSQo6lD6Ppb28VEE7twspMdcO3etTZu3',
+  'General Medicine': 'https://lh3.googleusercontent.com/aida-public/AB6AXuAbL4doiu_cLDtDOGmt9-Gu6Zl9kciYdkwFQhobFmctm1biNQqGk67idXE5scngeVWyCvbUG_7Wg_xneVV_vWRmNyAenjWBQE-Juq9GjxDRDS8QlEWDOZO9ZRIoCU6yK2pO5s1REdCP_UVlo6d-TjtUtX0BD-LeZBMpG_Hxv_M3iyZACrTIzZqaCLHQ-HJmbpobAPv8V9npecDZ_FbZW1wA0rKNzCdp0kYVhDWm9FXn6VvbUzNmvYqS',
+  'Pediatrics': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDysuOWTKE1HGSvaZM1vobwe_8CGK0rnsR4jKdMCXrEfTkqm23Gv6RO_JYGpgC3bpEGaTw6YsG6r1VaLV6vrVsdsLd2oznQwOicHvTfi0ga7Maqwh9Qf75cJaeqpeqJqqupclvfeHS0HBdyJgnPWTsXTX63kszbmD_NsQ-5ob3KevGr3KT1MQeEgZnnx2aShqcxPO-kw1F-zdjejfWbVEMxFuFVRoVKUwoVoGr_PCZcb_w2PKxINHV7',
+  'Dermatology': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBP5RtuhIa5J95ebHfYTHPzu1bKVteDYvlCdpO3dr7kmAz9YMrpPx93gMfcBNQZbxx8kBx4cwHpS928p6gG8-56iBAC9TFHn6G_fJWHyZJKboBFu7qgRqa3gmxLFUblrcg8NgUaODhNdxM4t2QKSJWPkFIiy0fw_uwlLo6HfeF0hpeeBQTvcFnlTtfYIHzbAivIPpKL7CQ6ZEQPOkMar4wsKkdPs408kJlkaBl1tD79c5zTIj_g1F7n'
+};
 
 export const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'BOOK' | 'APPOINTMENTS' | 'MEDICATIONS'>('BOOK');
+  const [navTab, setNavTab] = useState<'Dashboard' | 'Schedule' | 'Records' | 'Settings'>('Dashboard');
 
-  // Booking State
+  // Booking & Specialist State
   const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [selectedSpec, setSelectedSpec] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorListItem | null>(null);
 
+  // Date Strip (Next 7 Days)
+  const [dateList, setDateList] = useState<{ dayName: string; dayNum: number; fullDate: string }[]>([]);
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
+
   const [availability, setAvailability] = useState<{
     isOnLeave: boolean;
     leaveReason?: string;
@@ -42,17 +43,33 @@ export const PatientDashboard: React.FC = () => {
   } | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  // Modal State
+  // Selected Slot & Hold
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [holdToken, setHoldToken] = useState<string | undefined>(undefined);
   const [holdingSlot, setHoldingSlot] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Appointments & Medications State
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [medications, setMedications] = useState<MedicationReminderItem[]>([]);
-  const [loadingData, setLoadingData] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(false);
 
-  // Load doctors & specializations
+  // Generate 7-day strip
+  useEffect(() => {
+    const list = [];
+    const now = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(now.getDate() + i);
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNum = d.getDate();
+      const fullDate = d.toISOString().split('T')[0];
+      list.push({ dayName, dayNum, fullDate });
+    }
+    setDateList(list);
+  }, []);
+
+  // Load Doctors & Specializations
   useEffect(() => {
     async function loadInit() {
       try {
@@ -72,7 +89,7 @@ export const PatientDashboard: React.FC = () => {
     loadInit();
   }, []);
 
-  // Filter doctors
+  // Filter Doctors
   useEffect(() => {
     async function filterDocs() {
       try {
@@ -88,11 +105,13 @@ export const PatientDashboard: React.FC = () => {
     filterDocs();
   }, [searchQuery, selectedSpec]);
 
-  // Load doctor availability when doctor or date changes
+  // Load Doctor Availability
   useEffect(() => {
     if (!selectedDoctor) return;
     async function loadAvailability() {
       setLoadingSlots(true);
+      setSelectedSlot(null);
+      setHoldToken(undefined);
       try {
         const res = await api.getDoctorAvailability(selectedDoctor!.id, selectedDate);
         setAvailability(res);
@@ -107,7 +126,7 @@ export const PatientDashboard: React.FC = () => {
 
   // Load Appointments & Medications
   const refreshUserData = async () => {
-    setLoadingData(true);
+    setLoadingUserData(true);
     try {
       const [aptRes, medRes] = await Promise.all([
         api.getAppointments(),
@@ -118,18 +137,16 @@ export const PatientDashboard: React.FC = () => {
     } catch (err) {
       console.error('Failed to load user data:', err);
     } finally {
-      setLoadingData(false);
+      setLoadingUserData(false);
     }
   };
 
   useEffect(() => {
-    if (activeTab === 'APPOINTMENTS' || activeTab === 'MEDICATIONS') {
-      refreshUserData();
-    }
-  }, [activeTab]);
+    refreshUserData();
+  }, []);
 
-  // Handle Slot Click -> Hold Slot with Concurrency Lock
-  const handleSlotClick = async (slot: TimeSlot) => {
+  // Handle Slot Selection with Temporary Lock Hold
+  const handleSlotSelect = async (slot: TimeSlot) => {
     if (!slot.isAvailable || !selectedDoctor) return;
     setHoldingSlot(true);
     try {
@@ -137,8 +154,7 @@ export const PatientDashboard: React.FC = () => {
       setHoldToken(res.holdToken);
       setSelectedSlot(slot);
     } catch (err: any) {
-      alert(err.message || 'Slot could not be held.');
-      // Refresh slots
+      alert(err.message || 'Slot could not be reserved.');
       const updated = await api.getDoctorAvailability(selectedDoctor.id, selectedDate);
       setAvailability(updated);
     } finally {
@@ -146,519 +162,492 @@ export const PatientDashboard: React.FC = () => {
     }
   };
 
-  const handleCancelAppointment = async (id: string) => {
-    if (!confirm('Are you sure you want to cancel this appointment?')) return;
-    try {
-      await api.cancelAppointment(id, 'Cancelled by patient');
-      refreshUserData();
-    } catch (err: any) {
-      alert(err.message || 'Failed to cancel appointment');
-    }
-  };
-
-  const handleToggleMedication = async (id: string) => {
-    try {
-      await api.toggleMedicationReminder(id);
-      setMedications(prev =>
-        prev.map(m => (m.id === id ? { ...m, isActive: !m.isActive } : m))
-      );
-    } catch (err: any) {
-      alert(err.message || 'Failed to toggle medication reminder');
-    }
-  };
+  const activeMedsCount = medications.filter(m => m.isActive).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-[#dae2fd]">
-      {/* Hero Welcome Banner */}
-      <div className="ai-gradient-card rounded-3xl p-6 sm:p-8 text-white shadow-glass flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-white/5 skew-x-12 pointer-events-none" />
-        <div className="space-y-2 z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-secondary-container/30 text-secondary text-xs font-semibold backdrop-blur-md border border-secondary/20">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-            <span className="font-heading">AI-Powered Clinical Precision</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading text-white">
-            Welcome, {user?.name}
-          </h2>
-          <p className="text-xs sm:text-sm text-on-surface-variant max-w-xl leading-relaxed">
-            Discover top clinic specialists, receive real-time AI pre-visit urgency assessments, and review translated care plans with synchronized medication schedules.
-          </p>
-        </div>
+    <div className="bg-background text-on-background min-h-screen relative selection:bg-primary/30 selection:text-primary">
+      <FluidShaderCanvas />
 
-        <div className="flex bg-surface-container-lowest/80 p-1.5 rounded-2xl backdrop-blur-xl border border-white/10 z-10 shrink-0 shadow-glass">
-          <button
-            onClick={() => setActiveTab('BOOK')}
-            className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2 font-heading ${
-              activeTab === 'BOOK' ? 'bg-primary-container text-white shadow-neon-cyan' : 'text-on-surface-variant hover:text-white'
-            }`}
-          >
-            <CalendarIcon className="w-4 h-4" />
-            <span>Book Specialist</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('APPOINTMENTS')}
-            className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2 font-heading ${
-              activeTab === 'APPOINTMENTS' ? 'bg-primary-container text-white shadow-neon-cyan' : 'text-on-surface-variant hover:text-white'
-            }`}
-          >
-            <History className="w-4 h-4" />
-            <span>Visits & Care Plans</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('MEDICATIONS')}
-            className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2 font-heading ${
-              activeTab === 'MEDICATIONS' ? 'bg-primary-container text-white shadow-neon-cyan' : 'text-on-surface-variant hover:text-white'
-            }`}
-          >
-            <Pill className="w-4 h-4" />
-            <span>Medication Tracker</span>
-          </button>
-        </div>
-      </div>
+      {/* Side Navigation Bar */}
+      <Sidebar activeTab={navTab} onTabChange={(tab) => setNavTab(tab as any)} />
 
-      {/* TAB 1: FIND & BOOK DOCTOR */}
-      {activeTab === 'BOOK' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Doctor Search & Selection */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="glass-panel rounded-2xl p-5 border border-white/10 shadow-glass space-y-4">
-              <h3 className="font-bold text-white text-sm flex items-center gap-2 font-heading">
-                <Search className="w-4 h-4 text-primary" />
-                Find Clinic Specialists
-              </h3>
+      {/* Top App Bar */}
+      <TopAppBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        title="Patient Portal"
+      />
 
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-on-surface-variant" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search doctor by name or specialty..."
-                  className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-surface-container border border-white/10 rounded-xl text-white placeholder-on-surface-variant/50 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
-                />
-              </div>
-
-              {/* Specialization Filter Chips */}
-              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pt-1">
-                <button
-                  onClick={() => setSelectedSpec('ALL')}
-                  className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all border ${
-                    selectedSpec === 'ALL'
-                      ? 'bg-primary-container text-white border-primary shadow-neon-cyan'
-                      : 'bg-surface-container text-on-surface-variant border-white/5 hover:border-white/20 hover:text-white'
-                  }`}
-                >
-                  All Specialties
-                </button>
-                {specializations.map(spec => (
-                  <button
-                    key={spec}
-                    onClick={() => setSelectedSpec(spec)}
-                    className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all border ${
-                      selectedSpec === spec
-                        ? 'bg-primary-container text-white border-primary shadow-neon-cyan'
-                        : 'bg-surface-container text-on-surface-variant border-white/5 hover:border-white/20 hover:text-white'
-                    }`}
-                  >
-                    {spec}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Doctors List */}
-            <div className="space-y-3 max-h-[580px] overflow-y-auto pr-1">
-              {doctors.map(doc => {
-                const isSelected = selectedDoctor?.id === doc.id;
-                return (
-                  <div
-                    key={doc.id}
-                    onClick={() => setSelectedDoctor(doc)}
-                    className={`p-5 rounded-2xl border transition-all cursor-pointer text-left relative ${
-                      isSelected
-                        ? 'glass-card border-primary ring-1 ring-primary/40 shadow-neon-cyan'
-                        : 'glass-panel border-white/10 hover:border-primary/40'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary-container/20 text-primary border border-primary/30 font-heading">
-                          {doc.specialization}
-                        </span>
-                        <h4 className="font-extrabold text-white text-base mt-2 font-heading">
-                          {doc.name}
-                        </h4>
-                        <p className="text-xs text-on-surface-variant mt-1 line-clamp-2 leading-relaxed">{doc.bio}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-sm font-bold text-white font-heading">${doc.consultationFee}</span>
-                        <span className="text-[10px] text-on-surface-variant block">/ visit</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-on-surface-variant">
-                      <span>{doc.roomNumber || 'Room 101'}</span>
-                      <span className="flex items-center gap-1 text-primary font-medium">
-                        <span>{doc.slotDurationMinutes} min slot</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {doctors.length === 0 && (
-                <div className="text-center py-12 glass-panel rounded-2xl border border-white/10 text-on-surface-variant text-xs">
-                  No doctors found matching your filters.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column: Schedule & Slot Selector */}
-          <div className="lg:col-span-7 space-y-4">
-            {selectedDoctor ? (
-              <div className="glass-panel rounded-2xl p-6 sm:p-7 border border-white/10 shadow-glass space-y-6">
-                {/* Doctor Header */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/10">
-                  <div>
-                    <div className="flex items-center gap-2.5">
-                      <h3 className="font-extrabold text-white text-xl font-heading">
-                        {selectedDoctor.name}
-                      </h3>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary-container/20 text-primary border border-primary/30 font-heading">
-                        {selectedDoctor.specialization}
-                      </span>
-                    </div>
-                    <p className="text-xs text-on-surface-variant mt-1.5">
-                      Hours: {selectedDoctor.workingHoursStart} - {selectedDoctor.workingHoursEnd} ({selectedDoctor.slotDurationMinutes} min duration)
+      {/* Main Canvas Area */}
+      <main className="fixed top-16 left-0 md:left-64 right-0 bottom-0 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col xl:flex-row gap-6">
+        {navTab === 'Dashboard' && (
+          <>
+            {/* Left Column: Primary Content */}
+            <div className="flex-1 flex flex-col gap-6 min-w-0">
+              {/* Header Section */}
+              <section className="flex flex-col gap-4">
+                {/* Disclaimer Banner */}
+                <div className="glass-card rounded-2xl p-4 flex items-start gap-3.5 border-l-4 border-l-error">
+                  <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5">
+                    warning
+                  </span>
+                  <div className="flex-1 text-xs">
+                    <p className="text-white font-bold font-heading">Emergency Medical Disclaimer</p>
+                    <p className="text-on-surface-variant mt-0.5 leading-relaxed">
+                      If you are experiencing a medical emergency, please call 911 or proceed to the nearest emergency room immediately.
                     </p>
                   </div>
+                </div>
 
-                  {/* Date Selector */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs font-bold text-on-surface-variant font-heading">Date:</label>
+                {/* Greeting & Badges */}
+                <div className="glass-card p-6 rounded-2xl flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div>
+                    <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+                      Good day, {user?.name}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-on-surface-variant mt-1.5">
+                      Explore clinical specialists, review AI symptom assessments, and schedule conflict-free appointments.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="bg-primary/10 border border-primary/25 text-primary px-4 py-2 rounded-full flex items-center gap-2 text-xs font-heading font-bold shadow-neon-cyan">
+                      <span className="material-symbols-outlined text-base">medication</span>
+                      <span>Active Medications: {activeMedsCount}</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Specialist Discovery Section */}
+              <section className="flex flex-col gap-4">
+                {/* Filters & Search */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-3 glass-card p-3.5 rounded-2xl">
+                  {/* Category Pills */}
+                  <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 hide-scrollbar">
+                    <button
+                      onClick={() => setSelectedSpec('ALL')}
+                      className={`font-heading text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+                        selectedSpec === 'ALL'
+                          ? 'bg-primary text-on-primary shadow-neon-cyan'
+                          : 'bg-surface-container/50 hover:bg-surface-container text-on-surface border border-outline-variant/40'
+                      }`}
+                    >
+                      All Specialties
+                    </button>
+                    {specializations.map(spec => (
+                      <button
+                        key={spec}
+                        onClick={() => setSelectedSpec(spec)}
+                        className={`font-heading text-xs font-bold px-4 py-2 rounded-full border whitespace-nowrap transition-all ${
+                          selectedSpec === spec
+                            ? 'bg-primary text-on-primary border-primary shadow-neon-cyan'
+                            : 'bg-surface-container/50 hover:bg-surface-container text-on-surface border-outline-variant/40'
+                        }`}
+                      >
+                        {spec}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="relative w-full md:w-64 shrink-0">
+                    <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">
+                      search
+                    </span>
                     <input
-                      type="date"
-                      min={todayStr}
-                      value={selectedDate}
-                      onChange={e => setSelectedDate(e.target.value)}
-                      className="text-xs font-semibold p-2.5 border border-white/10 rounded-xl bg-surface-container text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      placeholder="Search doctor or clinic..."
+                      className="w-full bg-surface-container/60 text-on-surface border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary rounded-full pl-10 pr-4 py-2 text-xs outline-none transition-all placeholder:text-on-surface-variant/70"
                     />
                   </div>
                 </div>
 
-                {/* Availability State */}
-                {loadingSlots ? (
-                  <div className="py-20 text-center text-on-surface-variant flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-3 border-primary-container border-t-transparent rounded-full animate-spin shadow-neon-cyan" />
-                    <span className="text-xs font-medium font-heading">Verifying slot availability...</span>
-                  </div>
-                ) : availability?.isOnLeave ? (
-                  <div className="p-6 bg-error-container/20 border border-error/30 rounded-2xl text-center space-y-2">
-                    <AlertCircle className="w-8 h-8 text-error mx-auto" />
-                    <h4 className="font-bold text-white text-sm font-heading">Doctor is on Leave on this Date</h4>
-                    <p className="text-xs text-on-surface-variant max-w-md mx-auto">
-                      {availability.leaveReason || 'The doctor is unavailable on this date. Please pick another date.'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 font-heading">
-                        <Clock className="w-4 h-4 text-primary" />
-                        Available Consultation Slots ({selectedDate})
-                      </h4>
-                      <div className="flex items-center gap-3 text-[11px]">
-                        <span className="flex items-center gap-1.5 text-on-surface-variant">
-                          <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Available
-                        </span>
-                        <span className="flex items-center gap-1.5 text-on-surface-variant">
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Held
-                        </span>
-                        <span className="flex items-center gap-1.5 text-on-surface-variant">
-                          <span className="w-2.5 h-2.5 rounded-full bg-slate-600" /> Booked
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Slots Grid */}
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 pt-2">
-                      {availability?.slots.map((slot, index) => {
-                        return (
-                          <button
-                            key={index}
-                            disabled={!slot.isAvailable || holdingSlot}
-                            onClick={() => handleSlotClick(slot)}
-                            className={`p-3 rounded-xl text-xs font-bold transition-all border text-center font-heading ${
-                              slot.status === 'AVAILABLE'
-                                ? 'bg-surface-container border-primary/40 text-primary hover:bg-primary-container hover:text-white hover:border-primary hover:shadow-neon-cyan active:scale-95'
-                                : slot.status === 'HELD'
-                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 cursor-not-allowed'
-                                : 'bg-surface-container-lowest/50 border-white/5 text-slate-500 cursor-not-allowed line-through'
-                            }`}
-                          >
-                            <span>{slot.startTime}</span>
-                            <span className="block text-[10px] font-normal opacity-70 mt-0.5">{slot.endTime}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {availability?.slots.length === 0 && (
-                      <div className="py-14 text-center text-on-surface-variant text-xs glass-card rounded-2xl border border-white/5">
-                        No consultation slots available on this date.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center p-12 glass-panel rounded-2xl border border-white/10 text-on-surface-variant text-xs">
-                Select a doctor to view their schedule and book a slot.
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: MY APPOINTMENTS & MEDICAL HISTORY */}
-      {activeTab === 'APPOINTMENTS' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="font-extrabold text-white text-lg flex items-center gap-2 font-heading">
-              <CalendarCheck className="w-5 h-5 text-primary" />
-              Your Consultation History & Upcoming Visits
-            </h3>
-            <button
-              onClick={refreshUserData}
-              disabled={loadingData}
-              className="text-xs font-bold text-primary hover:text-white bg-primary-container/20 hover:bg-primary-container px-3.5 py-1.5 rounded-xl border border-primary/30 transition-all font-heading"
-            >
-              Refresh
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {appointments.map(apt => (
-              <div
-                key={apt.id}
-                className="glass-panel rounded-2xl p-5 sm:p-6 border border-white/10 shadow-glass space-y-4"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-extrabold text-white text-base font-heading">
-                        Dr. {apt.doctor?.name}
-                      </span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary-container/20 text-primary border border-primary/30 font-heading">
-                        {apt.doctor?.specialization}
-                      </span>
-                      <span
-                        className={`text-xs px-2.5 py-0.5 font-extrabold rounded-full font-heading ${
-                          apt.status === 'BOOKED'
-                            ? 'bg-primary-container/20 text-primary border border-primary/40'
-                            : apt.status === 'COMPLETED'
-                            ? 'bg-tertiary-container/20 text-tertiary border border-tertiary/40'
-                            : 'bg-error-container/20 text-error border border-error/40'
+                {/* Doctor Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {doctors.map(doc => {
+                    const isSelected = selectedDoctor?.id === doc.id;
+                    const avatarUrl = DOCTOR_AVATARS[doc.specialization] || DOCTOR_AVATARS['General Medicine'];
+                    return (
+                      <div
+                        key={doc.id}
+                        onClick={() => setSelectedDoctor(doc)}
+                        className={`glass-card rounded-2xl p-5 flex flex-col justify-between gap-4 cursor-pointer transition-all duration-300 ${
+                          isSelected
+                            ? 'border-primary ring-1 ring-primary/50 shadow-neon-cyan bg-surface-container/80'
+                            : 'hover:border-primary/40'
                         }`}
                       >
-                        {apt.status}
-                      </span>
-                    </div>
+                        <div className="flex gap-4">
+                          <div className="relative shrink-0">
+                            <img
+                              src={avatarUrl}
+                              alt={doc.name}
+                              className="w-14 h-14 rounded-full object-cover border-2 border-surface-container-high shadow-md"
+                            />
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-tertiary rounded-full border-2 border-surface flex items-center justify-center"></div>
+                          </div>
+                          <div className="flex flex-col justify-center truncate">
+                            <h3 className="font-heading font-extrabold text-base text-white truncate">
+                              {doc.name}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="bg-secondary/15 text-secondary border border-secondary/25 px-2.5 py-0.5 rounded-full font-heading text-[10px] font-bold uppercase tracking-wider">
+                                {doc.specialization}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
 
-                    <p className="text-xs text-on-surface-variant mt-1.5 flex flex-wrap items-center gap-2">
-                      <span>Date: {apt.date}</span>
-                      <span>•</span>
-                      <span>Time: {apt.startTime} - {apt.endTime}</span>
-                      <span>•</span>
-                      <span>{apt.doctor?.roomNumber || 'Clinic Room 101'}</span>
-                    </p>
-                  </div>
+                        <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+                          {doc.bio || 'Experienced clinic specialist providing dedicated diagnostic consultations and preventive medical care.'}
+                        </p>
 
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={`/api/appointments/${apt.id}/ics`}
-                      download
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-surface-container hover:bg-surface-container-high rounded-xl border border-white/10 transition-colors font-heading"
-                      title="Download Calendar ICS"
-                    >
-                      <Download className="w-3.5 h-3.5 text-primary" />
-                      <span>.ICS</span>
-                    </a>
-                    {apt.status === 'BOOKED' && (
-                      <button
-                        onClick={() => handleCancelAppointment(apt.id)}
-                        className="px-3 py-1.5 text-xs font-bold text-error bg-error-container/20 hover:bg-error-container/30 border border-error/30 rounded-xl transition-colors font-heading"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </div>
+                        <div className="flex items-center justify-between py-2.5 border-y border-outline-variant/20 text-xs text-on-surface-variant">
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm text-primary">payments</span>
+                            <span className="text-white font-heading font-bold">${doc.consultationFee} / visit</span>
+                          </div>
+                          <div className="w-px h-4 bg-outline-variant/30"></div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm text-secondary">meeting_room</span>
+                            <span className="text-white font-medium">{doc.roomNumber || 'Room 101'}</span>
+                          </div>
+                        </div>
 
-                {/* Symptoms & AI Pre-visit Urgency Card */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-surface-container p-4 rounded-xl border border-white/5 space-y-1">
-                    <span className="font-bold text-on-surface-variant block uppercase tracking-wider text-[10px] font-heading">Reported Symptoms:</span>
-                    <p className="text-white leading-relaxed italic">"{apt.symptoms}"</p>
-                  </div>
-
-                  {apt.preVisitSummary && (
-                    <div className="ai-gradient-card p-4 rounded-xl space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-secondary flex items-center gap-1.5 font-heading text-xs">
-                          <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
-                          AI Pre-Visit Triage
-                        </span>
-                        <span
-                          className={`px-2.5 py-0.5 text-[10px] font-extrabold rounded-full font-heading ${
-                            apt.preVisitSummary.urgencyLevel === 'HIGH'
-                              ? 'bg-error-container/30 text-error border border-error/40'
-                              : apt.preVisitSummary.urgencyLevel === 'MEDIUM'
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
-                              : 'bg-tertiary-container/20 text-tertiary border border-tertiary/40'
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDoctor(doc);
+                          }}
+                          className={`w-full font-heading font-bold text-xs py-2.5 rounded-xl transition-all ${
+                            isSelected
+                              ? 'bg-primary text-on-primary shadow-neon-cyan'
+                              : 'bg-surface-container-highest/60 hover:bg-primary hover:text-on-primary text-on-surface border border-outline-variant/40'
                           }`}
                         >
-                          Urgency: {apt.preVisitSummary.urgencyLevel}
-                        </span>
+                          {isSelected ? 'Selected Specialist' : 'View Schedule & Slots'}
+                        </button>
                       </div>
-                      <p className="text-white text-xs">{apt.preVisitSummary.chiefComplaint}</p>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
+              </section>
+            </div>
 
-                {/* Post-Visit Clinical Summary & Care Plan (If Completed) */}
-                {apt.postVisitSummary && (
-                  <div className="mt-4 p-5 glass-card border border-tertiary/30 rounded-2xl space-y-3 text-xs">
-                    <span className="font-bold text-tertiary flex items-center gap-2 text-sm font-heading">
-                      <CheckCircle className="w-4 h-4 text-tertiary" />
-                      Doctor's Care Plan & AI Translated Summary
-                    </span>
-                    <p className="text-white leading-relaxed bg-surface-container p-3.5 rounded-xl border border-white/5">
-                      {apt.postVisitSummary.patientFriendlySummary}
-                    </p>
-                    {apt.postVisitSummary.followUpSteps && (
-                      <div className="text-on-surface-variant whitespace-pre-wrap bg-surface-container p-3.5 rounded-xl border border-white/5">
-                        <strong className="text-tertiary block mb-1 font-heading">Follow-up Instructions:</strong>
-                        {apt.postVisitSummary.followUpSteps}
+            {/* Right Column: Sidebar Preview (Expanded Booking & Slots Panel) */}
+            <aside className="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-0">
+              <div className="glass-card border border-outline-variant/50 rounded-2xl flex flex-col overflow-hidden shadow-2xl relative">
+                {/* Subtle Gradient Header Bg */}
+                <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-primary/20 to-transparent pointer-events-none"></div>
+
+                {selectedDoctor ? (
+                  <>
+                    {/* Expanded Profile Header */}
+                    <div className="p-5 pb-4 flex flex-col items-center text-center relative z-10 border-b border-outline-variant/20">
+                      <img
+                        src={DOCTOR_AVATARS[selectedDoctor.specialization] || DOCTOR_AVATARS['General Medicine']}
+                        alt={selectedDoctor.name}
+                        className="w-20 h-20 rounded-full object-cover border-4 border-surface shadow-xl mb-2.5"
+                      />
+                      <h2 className="font-heading font-extrabold text-lg text-white">
+                        {selectedDoctor.name}
+                      </h2>
+                      <p className="text-xs text-primary font-heading font-bold mt-0.5">
+                        {selectedDoctor.specialization} Specialist
+                      </p>
+                      <div className="flex items-center gap-1 mt-2 text-secondary text-xs">
+                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-sm">star_half</span>
+                        <span className="text-[11px] text-on-surface-variant ml-1">(128 Patient Reviews)</span>
                       </div>
-                    )}
+                    </div>
+
+                    {/* Scrollable Booking Content */}
+                    <div className="p-5 flex flex-col gap-5 overflow-y-auto max-h-[440px]">
+                      {/* 7-Day Date Strip */}
+                      <div className="flex flex-col gap-2.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-heading text-xs font-bold text-white uppercase tracking-wider">
+                            Select Consultation Date
+                          </h4>
+                          <span className="text-[11px] text-primary font-medium">Upcoming 7 Days</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                          {dateList.map(item => {
+                            const isDateSelected = selectedDate === item.fullDate;
+                            return (
+                              <button
+                                key={item.fullDate}
+                                onClick={() => setSelectedDate(item.fullDate)}
+                                className={`flex flex-col items-center justify-center min-w-[56px] h-16 rounded-xl transition-all cursor-pointer ${
+                                  isDateSelected
+                                    ? 'bg-primary text-on-primary font-bold shadow-neon-cyan scale-95'
+                                    : 'bg-surface-container/50 hover:bg-surface-container border border-outline-variant/40 text-on-surface'
+                                }`}
+                              >
+                                <span className="text-[10px] uppercase opacity-80 font-heading">{item.dayName}</span>
+                                <span className="font-heading font-extrabold text-base">{item.dayNum}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Time Slots Matrix */}
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-heading text-xs font-bold text-white uppercase tracking-wider">
+                            Available Consultation Slots
+                          </h4>
+                          <span className="text-[10px] text-on-surface-variant">({selectedDoctor.slotDurationMinutes} min slots)</span>
+                        </div>
+
+                        {loadingSlots ? (
+                          <div className="py-8 text-center text-on-surface-variant flex flex-col items-center gap-2">
+                            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-xs">Checking live slots...</span>
+                          </div>
+                        ) : availability?.isOnLeave ? (
+                          <div className="p-4 bg-error-container/20 border border-error/30 rounded-xl text-center text-xs space-y-1">
+                            <span className="material-symbols-outlined text-error text-2xl">event_busy</span>
+                            <p className="font-heading font-bold text-white">Doctor On Approved Leave</p>
+                            <p className="text-on-surface-variant">{availability.leaveReason || 'Unavailable on this date.'}</p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-3 gap-2">
+                            {availability?.slots.map((slot, idx) => {
+                              const isPicked = selectedSlot?.startTime === slot.startTime;
+                              return (
+                                <button
+                                  key={idx}
+                                  disabled={!slot.isAvailable || holdingSlot}
+                                  onClick={() => handleSlotSelect(slot)}
+                                  className={`py-2 px-2 rounded-lg text-xs font-heading font-bold transition-all border ${
+                                    isPicked
+                                      ? 'bg-primary text-on-primary border-primary shadow-neon-cyan ring-1 ring-primary'
+                                      : slot.status === 'AVAILABLE'
+                                      ? 'bg-surface-container/60 hover:bg-primary/20 hover:border-primary border-outline-variant/40 text-white'
+                                      : slot.status === 'HELD'
+                                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 cursor-not-allowed'
+                                      : 'bg-surface-container-lowest/40 border-white/5 text-slate-600 line-through cursor-not-allowed'
+                                  }`}
+                                >
+                                  <span>{slot.startTime}</span>
+                                </button>
+                              );
+                            })}
+
+                            {availability?.slots.length === 0 && (
+                              <div className="col-span-3 py-6 text-center text-xs text-on-surface-variant bg-surface-container/30 rounded-xl">
+                                No consultation slots available on this date.
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Sticky Footer CTA */}
+                    <div className="p-4 bg-surface-container-lowest/90 backdrop-blur-xl border-t border-outline-variant/25">
+                      <button
+                        disabled={!selectedSlot || holdingSlot}
+                        onClick={() => setShowBookingModal(true)}
+                        className="w-full bg-primary hover:bg-primary-container text-on-primary font-heading font-extrabold text-xs py-3 rounded-xl transition-all shadow-neon-cyan hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-40"
+                      >
+                        <span>{selectedSlot ? `Confirm Appointment (${selectedSlot.startTime})` : 'Select a Slot Above'}</span>
+                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-12 text-center text-xs text-on-surface-variant">
+                    Select a specialist from the list to view profile and slots.
                   </div>
                 )}
               </div>
-            ))}
+            </aside>
+          </>
+        )}
 
-            {appointments.length === 0 && (
-              <div className="text-center py-14 glass-panel rounded-2xl border border-white/10 text-on-surface-variant text-xs">
-                You have no booked or past appointments yet.
+        {/* Schedule Tab: Consultation History */}
+        {navTab === 'Schedule' && (
+          <div className="flex-1 space-y-4">
+            <div className="glass-card p-5 rounded-2xl flex items-center justify-between">
+              <div>
+                <h3 className="font-heading font-extrabold text-lg text-white">Your Scheduled Consultations & Visits</h3>
+                <p className="text-xs text-on-surface-variant mt-0.5">Manage booked appointments, view diagnostic summaries, and download calendar schedules.</p>
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: MEDICATION REMINDERS */}
-      {activeTab === 'MEDICATIONS' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-extrabold text-white text-lg flex items-center gap-2 font-heading">
-                <Pill className="w-5 h-5 text-tertiary" />
-                Active Medication Schedules & Alerts
-              </h3>
-              <p className="text-xs text-on-surface-variant mt-1">
-                Automated email alerts are dispatched based on your prescribed dosage times.
-              </p>
-            </div>
-            <button
-              onClick={refreshUserData}
-              disabled={loadingData}
-              className="text-xs font-bold text-tertiary hover:text-white bg-tertiary-container/20 hover:bg-tertiary-container px-3.5 py-1.5 rounded-xl border border-tertiary/30 transition-all font-heading"
-            >
-              Refresh
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {medications.map(med => (
-              <div
-                key={med.id}
-                className={`glass-panel rounded-2xl p-5 border transition-all space-y-3.5 ${
-                  med.isActive ? 'border-tertiary/40 shadow-sm' : 'border-white/5 opacity-50'
-                }`}
+              <button
+                onClick={refreshUserData}
+                disabled={loadingUserData}
+                className="px-4 py-2 bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 rounded-xl text-xs font-heading font-bold transition-all"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <span className="text-[11px] font-bold text-tertiary px-2.5 py-0.5 bg-tertiary-container/20 rounded-full border border-tertiary/30 font-heading">
-                      {med.dosage} • {med.frequency}
-                    </span>
-                    <h4 className="font-extrabold text-white text-base mt-2 font-heading">
-                      {med.medicineName}
-                    </h4>
-                    <p className="text-xs text-on-surface-variant mt-0.5">
-                      Prescribed by Dr. {med.doctorName} ({med.specialization})
-                    </p>
+                Refresh
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {appointments.map(apt => (
+                <div key={apt.id} className="glass-card rounded-2xl p-5 border border-white/10 space-y-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-heading font-extrabold text-base text-white">
+                          Dr. {apt.doctor?.name}
+                        </span>
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/25 font-heading">
+                          {apt.doctor?.specialization}
+                        </span>
+                        <span
+                          className={`text-[10px] px-2.5 py-0.5 font-bold rounded-full font-heading ${
+                            apt.status === 'BOOKED'
+                              ? 'bg-primary/20 text-primary border border-primary/30'
+                              : apt.status === 'COMPLETED'
+                              ? 'bg-tertiary/20 text-tertiary border border-tertiary/30'
+                              : 'bg-error/20 text-error border border-error/30'
+                          }`}
+                        >
+                          {apt.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-1">
+                        Date: {apt.date} • Time: {apt.startTime} - {apt.endTime} • {apt.doctor?.roomNumber || 'Room 101'}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/api/appointments/${apt.id}/ics`}
+                        download
+                        className="px-3 py-1.5 text-xs font-bold text-white bg-surface-container hover:bg-surface-container-high rounded-xl border border-white/10 transition-colors flex items-center gap-1 font-heading"
+                      >
+                        <span className="material-symbols-outlined text-sm text-primary">download</span>
+                        <span>.ICS</span>
+                      </a>
+                    </div>
                   </div>
 
-                  <button
-                    onClick={() => handleToggleMedication(med.id)}
-                    className={`px-3 py-1 text-xs font-bold rounded-xl transition-all font-heading ${
-                      med.isActive
-                        ? 'bg-tertiary-container text-white shadow-sm'
-                        : 'bg-surface-container text-on-surface-variant'
-                    }`}
-                  >
-                    {med.isActive ? 'Active' : 'Paused'}
-                  </button>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5 space-y-1">
+                      <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block font-heading">Reported Symptoms:</span>
+                      <p className="text-white italic">"{apt.symptoms}"</p>
+                    </div>
 
-                <div className="bg-surface-container p-3.5 rounded-xl text-xs space-y-2 border border-white/5">
-                  <div className="flex items-center justify-between text-on-surface-variant">
-                    <span className="font-semibold">Daily Alert Times:</span>
-                    <span className="font-mono font-bold text-tertiary">
-                      {med.reminderTimes?.join(', ') || '09:00'}
-                    </span>
+                    {apt.preVisitSummary && (
+                      <div className="ai-gradient-card p-3.5 rounded-xl space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-secondary font-heading flex items-center gap-1">
+                            <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                            AI Pre-Visit Assessment
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-white font-heading">
+                            Urgency: {apt.preVisitSummary.urgencyLevel}
+                          </span>
+                        </div>
+                        <p className="text-white text-xs">{apt.preVisitSummary.chiefComplaint}</p>
+                      </div>
+                    )}
                   </div>
-                  {med.instructions && (
-                    <div className="text-on-surface-variant pt-1.5 border-t border-white/5">
-                      <span className="font-semibold text-white">Instructions: </span>
-                      {med.instructions}
+
+                  {apt.postVisitSummary && (
+                    <div className="p-4 bg-tertiary-container/10 border border-tertiary/30 rounded-xl space-y-2 text-xs">
+                      <span className="font-heading font-bold text-tertiary text-sm flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-base">verified</span>
+                        Doctor's Care Plan & AI Translated Summary
+                      </span>
+                      <p className="text-white leading-relaxed bg-surface-container p-3 rounded-lg border border-white/5">
+                        {apt.postVisitSummary.patientFriendlySummary}
+                      </p>
                     </div>
                   )}
-                  <div className="text-[11px] text-on-surface-variant/70 pt-1.5 flex justify-between">
-                    <span>From: {med.startDate}</span>
-                    <span>Until: {med.endDate}</span>
+                </div>
+              ))}
+
+              {appointments.length === 0 && (
+                <div className="text-center py-16 glass-card rounded-2xl text-xs text-on-surface-variant">
+                  No appointments found. Use the Dashboard to book your first clinical consultation.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Records Tab: Medication Reminders */}
+        {(navTab === 'Records' || navTab === 'Settings') && (
+          <div className="flex-1 space-y-4">
+            <div className="glass-card p-5 rounded-2xl flex items-center justify-between">
+              <div>
+                <h3 className="font-heading font-extrabold text-lg text-white">Active Medication Schedules & Alerts</h3>
+                <p className="text-xs text-on-surface-variant mt-0.5">Automated email alerts are dispatched at your prescribed daily dose timings.</p>
+              </div>
+              <button
+                onClick={refreshUserData}
+                disabled={loadingUserData}
+                className="px-4 py-2 bg-tertiary/15 hover:bg-tertiary/25 text-tertiary border border-tertiary/30 rounded-xl text-xs font-heading font-bold transition-all"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {medications.map(med => (
+                <div key={med.id} className="glass-card rounded-2xl p-5 border border-white/10 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary border border-tertiary/30 font-heading">
+                        {med.dosage} • {med.frequency}
+                      </span>
+                      <h4 className="font-heading font-extrabold text-base text-white mt-1.5">{med.medicineName}</h4>
+                      <p className="text-xs text-on-surface-variant">Prescribed by Dr. {med.doctorName}</p>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg font-heading ${med.isActive ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container text-on-surface-variant'}`}>
+                      {med.isActive ? 'Active' : 'Paused'}
+                    </span>
+                  </div>
+
+                  <div className="bg-surface-container p-3 rounded-xl text-xs space-y-1.5 border border-white/5">
+                    <div className="flex justify-between text-on-surface-variant">
+                      <span>Daily Alert Times:</span>
+                      <span className="font-mono font-bold text-tertiary">{med.reminderTimes?.join(', ') || '09:00'}</span>
+                    </div>
+                    {med.instructions && (
+                      <p className="text-on-surface-variant pt-1 border-t border-white/5">
+                        <strong className="text-white">Instructions: </strong>{med.instructions}
+                      </p>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {medications.length === 0 && (
-              <div className="col-span-2 text-center py-14 glass-panel rounded-2xl border border-white/10 text-on-surface-variant text-xs">
-                No active medication reminders found. When your doctor prescribes medication, schedules appear here automatically.
-              </div>
-            )}
+              {medications.length === 0 && (
+                <div className="col-span-2 text-center py-16 glass-card rounded-2xl text-xs text-on-surface-variant">
+                  No active medication reminders. When your doctor prescribes medication during consultation, it automatically appears here.
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
-      {/* Symptom Questionnaire & Booking Modal */}
-      {selectedDoctor && selectedSlot && (
+      {/* Pre-Visit Symptom Questionnaire & Confirmation Modal */}
+      {selectedDoctor && selectedSlot && showBookingModal && (
         <SymptomModal
           doctor={selectedDoctor}
           date={selectedDate}
           slot={selectedSlot}
           holdToken={holdToken}
-          onClose={() => {
-            setSelectedSlot(null);
-            setHoldToken(undefined);
-          }}
+          onClose={() => setShowBookingModal(false)}
           onSuccess={() => {
+            setShowBookingModal(false);
             setSelectedSlot(null);
             setHoldToken(undefined);
-            setActiveTab('APPOINTMENTS');
+            setNavTab('Schedule');
             refreshUserData();
           }}
         />
@@ -666,4 +655,3 @@ export const PatientDashboard: React.FC = () => {
     </div>
   );
 };
-
