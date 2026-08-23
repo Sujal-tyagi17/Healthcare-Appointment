@@ -117,6 +117,12 @@ export const PatientDashboard: React.FC = () => {
       try {
         const res = await api.getDoctorAvailability(selectedDoctor!.id, selectedDate);
         setAvailability(res);
+        if (!res.isOnLeave && res.slots && res.slots.length > 0) {
+          const firstAvail = res.slots.find(s => s.isAvailable);
+          if (firstAvail) {
+            handleSlotSelect(firstAvail);
+          }
+        }
       } catch (err) {
         console.error('Failed to fetch availability:', err);
       } finally {
@@ -228,15 +234,15 @@ export const PatientDashboard: React.FC = () => {
               {/* Specialist Discovery Section */}
               <section className="flex flex-col gap-4">
                 {/* Filters & Search */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-3 glass-card p-3.5 rounded-2xl">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-2xl">
                   {/* Category Pills */}
-                  <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 hide-scrollbar">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setSelectedSpec('ALL')}
-                      className={`font-heading text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+                      className={`font-heading text-xs font-bold px-4 py-2 rounded-full transition-all ${
                         selectedSpec === 'ALL'
                           ? 'bg-primary text-on-primary shadow-neon-cyan'
-                          : 'bg-surface-container/50 hover:bg-surface-container text-on-surface border border-outline-variant/40'
+                          : 'bg-surface-container/60 hover:bg-surface-container text-on-surface border border-outline-variant/40'
                       }`}
                     >
                       All Specialties
@@ -245,10 +251,10 @@ export const PatientDashboard: React.FC = () => {
                       <button
                         key={spec}
                         onClick={() => setSelectedSpec(spec)}
-                        className={`font-heading text-xs font-bold px-4 py-2 rounded-full border whitespace-nowrap transition-all ${
+                        className={`font-heading text-xs font-bold px-4 py-2 rounded-full border transition-all ${
                           selectedSpec === spec
                             ? 'bg-primary text-on-primary border-primary shadow-neon-cyan'
-                            : 'bg-surface-container/50 hover:bg-surface-container text-on-surface border-outline-variant/40'
+                            : 'bg-surface-container/60 hover:bg-surface-container text-on-surface border-outline-variant/40'
                         }`}
                       >
                         {spec}
@@ -257,7 +263,7 @@ export const PatientDashboard: React.FC = () => {
                   </div>
 
                   {/* Search Input */}
-                  <div className="relative w-full md:w-64 shrink-0">
+                  <div className="relative min-w-[220px]">
                     <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">
                       search
                     </span>
@@ -282,7 +288,7 @@ export const PatientDashboard: React.FC = () => {
                         onClick={() => setSelectedDoctor(doc)}
                         className={`glass-card rounded-2xl p-5 flex flex-col justify-between gap-4 cursor-pointer transition-all duration-300 ${
                           isSelected
-                            ? 'border-primary ring-1 ring-primary/50 shadow-neon-cyan bg-surface-container/80'
+                            ? 'border-primary ring-2 ring-primary/50 shadow-neon-cyan bg-surface-container/90 scale-[1.01]'
                             : 'hover:border-primary/40'
                         }`}
                       >
@@ -323,19 +329,22 @@ export const PatientDashboard: React.FC = () => {
                           </div>
                         </div>
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedDoctor(doc);
-                          }}
-                          className={`w-full font-heading font-bold text-xs py-2.5 rounded-xl transition-all ${
-                            isSelected
-                              ? 'bg-primary text-on-primary shadow-neon-cyan'
-                              : 'bg-surface-container-highest/60 hover:bg-primary hover:text-on-primary text-on-surface border border-outline-variant/40'
-                          }`}
-                        >
-                          {isSelected ? 'Selected Specialist' : 'View Schedule & Slots'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDoctor(doc);
+                            }}
+                            className={`flex-1 font-heading font-bold text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                              isSelected
+                                ? 'bg-primary text-on-primary shadow-neon-cyan'
+                                : 'bg-surface-container-highest/70 hover:bg-primary hover:text-on-primary text-on-surface border border-outline-variant/40'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-base">calendar_month</span>
+                            <span>{isSelected ? '✓ Selected (Pick Slot on Right)' : 'Select & View Slots'}</span>
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -463,11 +472,26 @@ export const PatientDashboard: React.FC = () => {
                     {/* Sticky Footer CTA */}
                     <div className="p-4 bg-surface-container-lowest/90 backdrop-blur-xl border-t border-outline-variant/25">
                       <button
-                        disabled={!selectedSlot || holdingSlot}
-                        onClick={() => setShowBookingModal(true)}
-                        className="w-full bg-primary hover:bg-primary-container text-on-primary font-heading font-extrabold text-xs py-3 rounded-xl transition-all shadow-neon-cyan hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-40"
+                        disabled={availability?.isOnLeave || holdingSlot}
+                        onClick={() => {
+                          if (selectedSlot) {
+                            setShowBookingModal(true);
+                          } else if (availability?.slots && availability.slots.length > 0) {
+                            const first = availability.slots.find(s => s.isAvailable);
+                            if (first) {
+                              handleSlotSelect(first);
+                              setShowBookingModal(true);
+                            }
+                          }
+                        }}
+                        className="w-full bg-gradient-to-r from-primary to-primary-container hover:brightness-110 text-on-primary font-heading font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-neon-cyan hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-40"
                       >
-                        <span>{selectedSlot ? `Confirm Appointment (${selectedSlot.startTime})` : 'Select a Slot Above'}</span>
+                        <span className="material-symbols-outlined text-base">calendar_add_on</span>
+                        <span>
+                          {selectedSlot
+                            ? `Confirm & Book Appointment (${selectedSlot.startTime})`
+                            : 'Select Time Slot & Book'}
+                        </span>
                         <span className="material-symbols-outlined text-base">arrow_forward</span>
                       </button>
                     </div>
