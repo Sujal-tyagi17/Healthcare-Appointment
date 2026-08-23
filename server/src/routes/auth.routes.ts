@@ -36,8 +36,23 @@ router.post('/register', async (req, res) => {
         password: hashedPassword,
         name: data.name,
         role: data.role,
-        phone: data.phone
-      }
+        phone: data.phone,
+        ...(data.role === 'DOCTOR'
+          ? {
+              doctorProfile: {
+                create: {
+                  specialization: (req.body.specialization as string) || 'General Medicine',
+                  slotDurationMinutes: 30,
+                  workingHoursStart: '09:00',
+                  workingHoursEnd: '17:00',
+                  consultationFee: 75.0,
+                  roomNumber: 'Room 101'
+                }
+              }
+            }
+          : {})
+      },
+      include: { doctorProfile: true }
     });
 
     const token = generateToken({
