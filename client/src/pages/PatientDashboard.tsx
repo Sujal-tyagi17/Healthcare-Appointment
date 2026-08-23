@@ -153,10 +153,22 @@ export const PatientDashboard: React.FC = () => {
     refreshUserData();
   }, []);
 
-  // Pick Slot (Visual Selection)
-  const handleSlotPick = (slot: TimeSlot) => {
-    if (!slot.isAvailable) return;
+  // Pick Slot & Immediately Open Booking Modal with Hold Lock
+  const handleSlotPick = async (slot: TimeSlot) => {
+    if (!slot.isAvailable || !selectedDoctor) return;
     setSelectedSlot(slot);
+    setHoldingSlot(true);
+    try {
+      const res = await api.holdSlot(selectedDoctor.id, selectedDate, slot.startTime, slot.endTime);
+      setHoldToken(res.holdToken);
+      setShowBookingModal(true);
+    } catch (err: any) {
+      alert(err.message || 'Slot could not be reserved. Please select another slot.');
+      const updated = await api.getDoctorAvailability(selectedDoctor.id, selectedDate);
+      setAvailability(updated);
+    } finally {
+      setHoldingSlot(false);
+    }
   };
 
   // Open Booking & Acquire Slot Hold Token
@@ -367,32 +379,32 @@ export const PatientDashboard: React.FC = () => {
                 {selectedDoctor ? (
                   <>
                     {/* Expanded Profile Header */}
-                    <div className="p-5 pb-4 flex flex-col items-center text-center relative z-10 border-b border-outline-variant/20">
+                    <div className="p-4 pb-3 flex flex-col items-center text-center relative z-10 border-b border-outline-variant/20">
                       <img
                         src={DOCTOR_AVATARS[selectedDoctor.specialization] || DOCTOR_AVATARS['General Medicine']}
                         alt={selectedDoctor.name}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-surface shadow-xl mb-2.5"
+                        className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-lg mb-1.5"
                       />
-                      <h2 className="font-heading font-extrabold text-lg text-white">
+                      <h2 className="font-heading font-extrabold text-base text-white">
                         {selectedDoctor.name}
                       </h2>
-                      <p className="text-xs text-primary font-heading font-bold mt-0.5">
+                      <p className="text-xs text-primary font-heading font-bold">
                         {selectedDoctor.specialization} Specialist
                       </p>
-                      <div className="flex items-center gap-1 mt-2 text-secondary text-xs">
-                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-sm">star_half</span>
-                        <span className="text-[11px] text-on-surface-variant ml-1">(128 Patient Reviews)</span>
+                      <div className="flex items-center gap-1 mt-1 text-secondary text-xs">
+                        <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="material-symbols-outlined text-xs">star_half</span>
+                        <span className="text-[10px] text-on-surface-variant ml-1">(128 Patient Reviews)</span>
                       </div>
                     </div>
 
                     {/* Scrollable Booking Content */}
-                    <div className="p-5 flex flex-col gap-5 overflow-y-auto max-h-[440px]">
+                    <div className="p-4 flex flex-col gap-4 overflow-y-auto max-h-[340px]">
                       {/* 7-Day Date Strip */}
-                      <div className="flex flex-col gap-2.5">
+                      <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-heading text-xs font-bold text-white uppercase tracking-wider">
                             Select Consultation Date
@@ -407,14 +419,14 @@ export const PatientDashboard: React.FC = () => {
                               <button
                                 key={item.fullDate}
                                 onClick={() => setSelectedDate(item.fullDate)}
-                                className={`flex flex-col items-center justify-center min-w-[56px] h-16 rounded-xl transition-all cursor-pointer ${
+                                className={`flex flex-col items-center justify-center min-w-[52px] h-14 rounded-xl transition-all cursor-pointer ${
                                   isDateSelected
                                     ? 'bg-primary text-on-primary font-bold shadow-neon-cyan scale-95'
                                     : 'bg-surface-container/50 hover:bg-surface-container border border-outline-variant/40 text-on-surface'
                                 }`}
                               >
-                                <span className="text-[10px] uppercase opacity-80 font-heading">{item.dayName}</span>
-                                <span className="font-heading font-extrabold text-base">{item.dayNum}</span>
+                                <span className="text-[9px] uppercase opacity-80 font-heading">{item.dayName}</span>
+                                <span className="font-heading font-extrabold text-sm">{item.dayNum}</span>
                               </button>
                             );
                           })}
