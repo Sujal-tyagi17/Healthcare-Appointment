@@ -18,7 +18,7 @@ const DOCTOR_AVATARS: Record<string, string> = {
   'Neurology': 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80',
   'General Medicine': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=400&q=80',
   'Pediatrics': 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80',
-  'Dermatology': 'https://images.unsplash.com/photo-1594824813589-cf77864f7ec6?auto=format&fit=crop&w=400&q=80'
+  'Dermatology': 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&w=400&q=80'
 };
 
 export const PatientDashboard: React.FC = () => {
