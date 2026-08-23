@@ -120,7 +120,7 @@ export const PatientDashboard: React.FC = () => {
         if (!res.isOnLeave && res.slots && res.slots.length > 0) {
           const firstAvail = res.slots.find(s => s.isAvailable);
           if (firstAvail) {
-            handleSlotSelect(firstAvail);
+            setSelectedSlot(firstAvail);
           }
         }
       } catch (err) {
@@ -153,16 +153,22 @@ export const PatientDashboard: React.FC = () => {
     refreshUserData();
   }, []);
 
-  // Handle Slot Selection with Temporary Lock Hold
-  const handleSlotSelect = async (slot: TimeSlot) => {
-    if (!slot.isAvailable || !selectedDoctor) return;
+  // Pick Slot (Visual Selection)
+  const handleSlotPick = (slot: TimeSlot) => {
+    if (!slot.isAvailable) return;
+    setSelectedSlot(slot);
+  };
+
+  // Open Booking & Acquire Slot Hold Token
+  const handleOpenBookingModal = async () => {
+    if (!selectedSlot || !selectedDoctor) return;
     setHoldingSlot(true);
     try {
-      const res = await api.holdSlot(selectedDoctor.id, selectedDate, slot.startTime, slot.endTime);
+      const res = await api.holdSlot(selectedDoctor.id, selectedDate, selectedSlot.startTime, selectedSlot.endTime);
       setHoldToken(res.holdToken);
-      setSelectedSlot(slot);
+      setShowBookingModal(true);
     } catch (err: any) {
-      alert(err.message || 'Slot could not be reserved.');
+      alert(err.message || 'Slot could not be reserved. Please select another slot.');
       const updated = await api.getDoctorAvailability(selectedDoctor.id, selectedDate);
       setAvailability(updated);
     } finally {
@@ -443,8 +449,8 @@ export const PatientDashboard: React.FC = () => {
                                 <button
                                   key={idx}
                                   disabled={!slot.isAvailable || holdingSlot}
-                                  onClick={() => handleSlotSelect(slot)}
-                                  className={`py-2 px-2 rounded-lg text-xs font-heading font-bold transition-all border ${
+                                  onClick={() => handleSlotPick(slot)}
+                                  className={`py-2.5 px-2 rounded-lg text-xs font-heading font-bold transition-all border ${
                                     isPicked
                                       ? 'bg-primary text-on-primary border-primary shadow-neon-cyan ring-1 ring-primary'
                                       : slot.status === 'AVAILABLE'
@@ -472,23 +478,15 @@ export const PatientDashboard: React.FC = () => {
                     {/* Sticky Footer CTA */}
                     <div className="p-4 bg-surface-container-lowest/90 backdrop-blur-xl border-t border-outline-variant/25">
                       <button
-                        disabled={availability?.isOnLeave || holdingSlot}
-                        onClick={() => {
-                          if (selectedSlot) {
-                            setShowBookingModal(true);
-                          } else if (availability?.slots && availability.slots.length > 0) {
-                            const first = availability.slots.find(s => s.isAvailable);
-                            if (first) {
-                              handleSlotSelect(first);
-                              setShowBookingModal(true);
-                            }
-                          }
-                        }}
+                        disabled={!selectedSlot || availability?.isOnLeave || holdingSlot}
+                        onClick={handleOpenBookingModal}
                         className="w-full bg-gradient-to-r from-primary to-primary-container hover:brightness-110 text-on-primary font-heading font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-neon-cyan hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-40"
                       >
                         <span className="material-symbols-outlined text-base">calendar_add_on</span>
                         <span>
-                          {selectedSlot
+                          {holdingSlot
+                            ? 'Reserving Slot...'
+                            : selectedSlot
                             ? `Confirm & Book Appointment (${selectedSlot.startTime})`
                             : 'Select Time Slot & Book'}
                         </span>
