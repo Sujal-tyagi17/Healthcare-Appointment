@@ -191,14 +191,16 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
 
         {/* Notifications Dropdown Panel */}
         {showNotifications && (
-          <div className="absolute right-0 top-12 w-80 sm:w-96 glass-panel rounded-2xl border border-outline-variant shadow-2xl overflow-hidden z-50 animate-fade-in">
+          <div className="absolute right-0 top-13 w-80 sm:w-96 bg-[#0b1328] border border-cyan-500/25 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden z-50 animate-fade-in backdrop-blur-3xl ring-1 ring-white/10">
             {/* Dropdown Header */}
-            <div className="p-3.5 border-b border-outline-variant flex items-center justify-between bg-surface-container/50">
+            <div className="p-3.5 border-b border-white/10 flex items-center justify-between bg-[#0f1b38]">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-base">notifications_active</span>
-                <span className="font-heading font-bold text-xs text-on-surface">Notifications</span>
+                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
+                  <span className="material-symbols-outlined text-sm">notifications_active</span>
+                </div>
+                <span className="font-heading font-extrabold text-xs text-white">Notifications</span>
                 {unreadCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold font-mono">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/25 text-primary text-[10px] font-extrabold font-mono border border-primary/40">
                     {unreadCount} new
                   </span>
                 )}
@@ -206,7 +208,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-[10px] text-primary hover:underline font-heading font-medium"
+                  className="text-[11px] text-primary hover:text-cyan-300 font-heading font-bold transition-colors"
                 >
                   Mark all as read
                 </button>
@@ -214,33 +216,35 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             </div>
 
             {/* Notification List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-outline-variant/40">
+            <div className="max-h-80 overflow-y-auto divide-y divide-white/5 bg-[#0b1328]">
               {notifications.length === 0 ? (
-                <div className="py-8 text-center text-on-surface-variant space-y-1">
-                  <span className="material-symbols-outlined text-2xl text-on-surface-variant/60">notifications_off</span>
-                  <p className="text-xs">No notifications yet</p>
+                <div className="py-10 text-center text-on-surface-variant space-y-2">
+                  <span className="material-symbols-outlined text-3xl text-on-surface-variant/40">notifications_off</span>
+                  <p className="text-xs font-medium">All caught up! No notifications.</p>
                 </div>
               ) : (
                 notifications.map(item => (
                   <div
                     key={item.id}
-                    className={`p-3 transition-colors flex items-start gap-3 relative group ${
-                      item.read ? 'bg-transparent hover:bg-surface-container/40' : 'bg-primary/5 hover:bg-primary/10'
+                    className={`p-3.5 transition-colors flex items-start gap-3 relative group ${
+                      item.read
+                        ? 'bg-[#0b1328] hover:bg-[#111e3b]'
+                        : 'bg-[#101d3a] hover:bg-[#15254a] border-l-2 border-primary'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant">
+                    <div className="w-8 h-8 rounded-xl bg-[#142347] flex items-center justify-center shrink-0 border border-white/10 shadow-sm">
                       {getIcon(item.type)}
                     </div>
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="text-xs font-bold font-heading text-on-surface truncate">
+                        <p className={`text-xs font-heading font-bold truncate ${item.read ? 'text-slate-200' : 'text-white'}`}>
                           {item.title}
                         </p>
-                        <span className="text-[10px] text-on-surface-variant font-mono shrink-0">
+                        <span className="text-[10px] text-cyan-400/80 font-mono shrink-0 font-medium">
                           {item.time}
                         </span>
                       </div>
-                      <p className="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">
                         {item.message}
                       </p>
                     </div>
@@ -251,7 +255,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
                         e.stopPropagation();
                         removeNotification(item.id);
                       }}
-                      className="absolute right-2 top-2 p-1 text-on-surface-variant/40 hover:text-error rounded transition-opacity opacity-0 group-hover:opacity-100"
+                      className="absolute right-2 top-2 p-1 text-slate-500 hover:text-red-400 rounded transition-opacity opacity-0 group-hover:opacity-100"
                       title="Dismiss notification"
                     >
                       <span className="material-symbols-outlined text-sm">close</span>
@@ -262,8 +266,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="p-2 border-t border-outline-variant bg-surface-container/30 text-center">
-              <span className="text-[10px] text-on-surface-variant">CarePulse Real-Time Clinical Notifications</span>
+            <div className="p-2.5 border-t border-white/10 bg-[#080e1c] text-center">
+              <span className="text-[10px] font-medium text-slate-400">CarePulse Real-Time Clinical Notifications</span>
             </div>
           </div>
         )}
