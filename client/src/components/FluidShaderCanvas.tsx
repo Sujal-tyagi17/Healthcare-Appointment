@@ -1,8 +1,8 @@
 import React from 'react';
-import { AuthBackground } from './AuthBackground';
+import { CarePulseBackground } from './CarePulseBackground';
 
 export const FluidShaderCanvas: React.FC = () => {
-  return <AuthBackground />;
+  return <CarePulseBackground />;
 };
 
 export default FluidShaderCanvas;
