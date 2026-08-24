@@ -126,65 +126,117 @@ export const AuthPage: React.FC = () => {
             </div>
 
             {/* Feature Cards based on active tab */}
-            <div className="glass-card rounded-2xl p-4.5 border border-white/10 shadow-glass transition-all">
+            <div className="glass-card rounded-2xl p-5 border border-white/10 shadow-glass transition-all">
+              {/* Tab 1: AI Symptom Triage */}
               {activeFeatureTab === 'triage' && (
-                <div className="space-y-2.5 animate-fade-in">
+                <div className="space-y-3.5 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <span className="font-heading font-bold text-xs text-white flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-secondary text-sm">auto_awesome</span>
-                      Real-Time AI Intake &amp; Urgency Stratification
+                      <span className="material-symbols-outlined text-secondary text-base">psychiatry</span>
+                      AI Intake &amp; Urgency Stratification
                     </span>
                     <span className="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-[10px] font-heading font-bold">
-                      MEDIUM URGENCY
+                      MODERATE URGENCY
                     </span>
                   </div>
-                  <p className="text-xs text-on-surface-variant bg-surface-container/70 p-3 rounded-xl border border-white/5 italic">
-                    "Patient reports recurring rash with mild inflammation since 3 days."
-                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-surface-container/80 p-3 rounded-xl border border-white/5 space-y-1.5 flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-secondary font-heading flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">record_voice_over</span>
+                          Patient Symptoms
+                        </span>
+                        <p className="text-xs text-white/90 italic mt-1 leading-relaxed">
+                          "Recurring skin rash with mild inflammation for 3 days."
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-on-surface-variant font-mono">Status: Analyzed by LLM</span>
+                    </div>
+
+                    <div className="bg-surface-container/80 p-3 rounded-xl border border-white/5 space-y-1.5 flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-tertiary font-heading flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">clinical_notes</span>
+                          Doctor Briefing
+                        </span>
+                        <p className="text-xs text-white/90 mt-1 leading-relaxed">
+                          Synthesized chief complaint and 3 pre-visit diagnostic inquiries.
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-on-surface-variant font-mono pt-1 border-t border-white/5">
+                        <span>Confidence: 94%</span>
+                        <span className="text-tertiary font-bold">Ready</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
+              {/* Tab 2: 10-Min Hold Engine */}
               {activeFeatureTab === 'slots' && (
-                <div className="space-y-2.5 animate-fade-in">
+                <div className="space-y-3.5 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <span className="font-heading font-bold text-xs text-white flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-primary text-sm">hourglass_top</span>
+                      <span className="material-symbols-outlined text-primary text-base">lock_clock</span>
                       Anti-Collision Slot Reservation
                     </span>
                     <span className="px-2.5 py-0.5 bg-primary/20 text-primary border border-primary/30 rounded-full text-[10px] font-heading font-bold">
-                      TEMPORARY LOCK
+                      ACTIVE LOCK
                     </span>
                   </div>
-                  <div className="p-3 bg-surface-container/70 rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-white">Dr. Rajesh Sharma (Cardiology)</p>
-                      <p className="text-[11px] text-on-surface-variant">Slot: 11:00 AM • Suite 201</p>
+
+                  <div className="bg-surface-container/80 p-3.5 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-primary text-sm">stethoscope</span>
+                        Dr. Rajesh Sharma (Cardiology)
+                      </p>
+                      <p className="text-[11px] text-on-surface-variant">Slot: 11:00 AM • Room 201 • Mutex Lock Active</p>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-mono font-bold text-primary">09:42</span>
-                      <p className="text-[9px] text-on-surface-variant uppercase">Hold Remaining</p>
+
+                    <div className="flex items-center sm:flex-col sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                      <span className="text-sm font-mono font-extrabold text-primary tracking-wider">09:42</span>
+                      <p className="text-[9px] text-on-surface-variant uppercase tracking-wider font-semibold">Hold Remaining</p>
                     </div>
+                  </div>
+
+                  {/* Visual countdown progress bar */}
+                  <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-primary to-secondary h-full rounded-full w-[85%] animate-pulse"></div>
                   </div>
                 </div>
               )}
 
+              {/* Tab 3: Medication Alarms */}
               {activeFeatureTab === 'care' && (
-                <div className="space-y-2.5 animate-fade-in">
+                <div className="space-y-3.5 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <span className="font-heading font-bold text-xs text-white flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-tertiary text-sm">medication</span>
-                      Automated Prescription Reminders
+                      <span className="material-symbols-outlined text-tertiary text-base">notifications_active</span>
+                      Automated Prescription Alarms
                     </span>
                     <span className="px-2.5 py-0.5 bg-tertiary/20 text-tertiary border border-tertiary/30 rounded-full text-[10px] font-heading font-bold">
                       ACTIVE ALARM
                     </span>
                   </div>
-                  <div className="p-3 bg-surface-container/70 rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-white">Metoprolol 25mg — Beta Blocker</p>
-                      <p className="text-[11px] text-on-surface-variant">Twice daily with meals (08:00 AM, 08:00 PM)</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="p-3 bg-surface-container/80 rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-white">Metoprolol 25mg</p>
+                        <p className="text-[10px] text-on-surface-variant">08:00 AM, 08:00 PM (Twice daily)</p>
+                      </div>
+                      <span className="material-symbols-outlined text-tertiary text-lg animate-pulse">alarm_on</span>
                     </div>
-                    <span className="material-symbols-outlined text-tertiary text-xl">notifications_active</span>
+
+                    <div className="p-3 bg-surface-container/80 rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-white">CoQ10 100mg</p>
+                        <p className="text-[10px] text-on-surface-variant">01:00 PM (After meals)</p>
+                      </div>
+                      <span className="material-symbols-outlined text-tertiary text-lg">alarm_on</span>
+                    </div>
                   </div>
                 </div>
               )}
