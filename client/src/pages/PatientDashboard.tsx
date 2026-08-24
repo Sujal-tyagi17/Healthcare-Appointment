@@ -458,7 +458,7 @@ export const PatientDashboard: React.FC = () => {
                         {loadingSlots ? (
                           <div className="py-8 text-center text-on-surface-variant flex flex-col items-center gap-2">
                             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-xs">Checking live slots...</span>
+                            <span className="text-xs">Loading...</span>
                           </div>
                         ) : availability?.isOnLeave ? (
                           <div className="p-4 bg-error-container/20 border border-error/30 rounded-xl text-center text-xs space-y-1">

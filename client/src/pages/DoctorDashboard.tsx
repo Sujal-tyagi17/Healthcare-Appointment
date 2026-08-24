@@ -166,7 +166,7 @@ export const DoctorDashboard: React.FC = () => {
                 {isLoading ? (
                   <div className="text-center py-16 text-on-surface-variant flex flex-col items-center gap-3">
                     <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-xs font-heading font-medium">Loading clinical queue...</span>
+                    <span className="text-xs font-heading font-medium">Loading...</span>
                   </div>
                 ) : (
                   filteredAppointments.map(apt => {

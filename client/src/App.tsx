@@ -10,10 +10,10 @@ export const App: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0b1326] flex flex-col items-center justify-center text-white space-y-4">
+      <div className="min-h-screen bg-[#070e1e] flex flex-col items-center justify-center text-white space-y-4">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-neon-cyan" />
         <p className="text-sm font-semibold tracking-wide text-on-surface-variant font-heading">
-          Loading CarePulse Healthcare Platform...
+          Loading...
         </p>
       </div>
     );
