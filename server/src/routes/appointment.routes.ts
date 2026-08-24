@@ -5,7 +5,7 @@ import { prisma } from '../db.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { AuthRequest } from '../types.js';
 import { generatePreVisitSummary } from '../services/llm.service.js';
-import { sendEmailNotification, getBookingConfirmationHtml } from '../services/email.service.js';
+import { sendEmailNotification, getBookingConfirmationHtml, formatDoctorName } from '../services/email.service.js';
 import { syncGoogleCalendarEvent, generateIcsContent, deleteGoogleCalendarEvent } from '../services/calendar.service.js';
 
 const router = Router();
@@ -211,9 +211,10 @@ router.post('/book', requireAuth, async (req: AuthRequest, res) => {
     });
 
     // 6. Google Calendar Event Creation & Link Generation
+    const doctorDisplayName = formatDoctorName(appointmentResult.doctor.name);
     const calEvent = await syncGoogleCalendarEvent({
       id: appointmentResult.id,
-      title: `CarePulse Consultation: ${appointmentResult.patient.name} & Dr. ${appointmentResult.doctor.name}`,
+      title: `CarePulse Consultation: ${appointmentResult.patient.name} & ${doctorDisplayName}`,
       description: `Chief Complaint: ${preVisitAnalysis.chiefComplaint}\nSymptoms: ${data.symptoms}\nUrgency: ${preVisitAnalysis.urgencyLevel}`,
       location: appointmentResult.doctor.doctorProfile?.roomNumber || 'Clinic Room 101',
       startDate: data.date,
@@ -246,7 +247,7 @@ router.post('/book', requireAuth, async (req: AuthRequest, res) => {
     await sendEmailNotification({
       recipientEmail: appointmentResult.patient.email,
       recipientName: appointmentResult.patient.name,
-      subject: `Appointment Confirmed: Dr. ${appointmentResult.doctor.name} on ${data.date}`,
+      subject: `Appointment Confirmed: ${doctorDisplayName} on ${data.date}`,
       type: 'BOOKING_CONFIRMATION',
       appointmentId: appointmentResult.id,
       html: emailHtmlPatient
@@ -426,10 +427,11 @@ router.get('/:id/ics', requireAuth, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Appointment not found' });
     }
 
+    const doctorDisplayName = formatDoctorName(apt.doctor.name);
     const icsString = generateIcsContent({
       id: apt.id,
-      title: `CarePulse: ${apt.patient.name} & Dr. ${apt.doctor.name}`,
-      description: `Appointment with Dr. ${apt.doctor.name} (${apt.doctor.doctorProfile?.specialization}).\nSymptoms: ${apt.symptoms}`,
+      title: `CarePulse: ${apt.patient.name} & ${doctorDisplayName}`,
+      description: `Appointment with ${doctorDisplayName} (${apt.doctor.doctorProfile?.specialization}).\nSymptoms: ${apt.symptoms}`,
       location: apt.doctor.doctorProfile?.roomNumber || 'CarePulse Clinic',
       startDate: apt.date,
       startTime: apt.startTime,

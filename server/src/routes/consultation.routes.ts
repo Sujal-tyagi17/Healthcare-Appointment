@@ -4,7 +4,7 @@ import { prisma } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
 import { AuthRequest, PrescriptionItem } from '../types.js';
 import { generatePostVisitSummary } from '../services/llm.service.js';
-import { sendEmailNotification, getPostVisitSummaryHtml } from '../services/email.service.js';
+import { sendEmailNotification, getPostVisitSummaryHtml, formatDoctorName } from '../services/email.service.js';
 
 const router = Router();
 
@@ -130,10 +130,11 @@ router.post('/:appointmentId/post-visit', requireAuth, requireRole(['DOCTOR', 'A
     }
 
     // Send email to patient with patient-friendly summary
+    const doctorDisplayName = formatDoctorName(apt.doctor.name);
     await sendEmailNotification({
       recipientEmail: apt.patient.email,
       recipientName: apt.patient.name,
-      subject: `Your Care Plan & Visit Summary - Dr. ${apt.doctor.name}`,
+      subject: `Your Care Plan & Visit Summary - ${doctorDisplayName}`,
       type: 'POST_VISIT_SUMMARY',
       appointmentId,
       html: getPostVisitSummaryHtml({

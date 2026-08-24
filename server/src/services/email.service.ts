@@ -167,6 +167,7 @@ export function getBookingConfirmationHtml(params: {
   urgencyLevel?: string;
   calendarLink?: string;
 }): string {
+  const doctorDisplay = formatDoctorName(params.doctorName);
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
     <div style="text-align: center; margin-bottom: 24px;">
@@ -181,7 +182,7 @@ export function getBookingConfirmationHtml(params: {
       <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
         <tr>
           <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Doctor:</td>
-          <td style="padding: 8px 0; color: #0f172a;">Dr. ${params.doctorName} (${params.specialization})</td>
+          <td style="padding: 8px 0; color: #0f172a;">${doctorDisplay} (${params.specialization})</td>
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Date & Time:</td>
@@ -218,6 +219,7 @@ export function getDoctorLeaveCancellationHtml(params: {
   rescheduleUrl: string;
   reason?: string;
 }): string {
+  const doctorDisplay = formatDoctorName(params.doctorName);
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #fff1f2; border-radius: 12px; border: 1px solid #fecdd3;">
     <div style="text-align: center; margin-bottom: 24px;">
@@ -228,7 +230,7 @@ export function getDoctorLeaveCancellationHtml(params: {
     <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
       <h2 style="color: #0f172a; font-size: 18px; margin-top: 0;">Dear ${params.patientName},</h2>
       <p style="color: #334155; line-height: 1.5;">
-        We regret to inform you that <strong>Dr. ${params.doctorName}</strong> is unavailable and on approved medical leave on <strong>${params.date}</strong>${params.reason ? ` (${params.reason})` : ''}.
+        We regret to inform you that <strong>${doctorDisplay}</strong> is unavailable and on approved medical leave on <strong>${params.date}</strong>${params.reason ? ` (${params.reason})` : ''}.
       </p>
       <p style="color: #334155; line-height: 1.5;">
         Your scheduled appointment on <strong>${params.date} at ${params.time}</strong> has been cancelled. We sincerely apologize for any inconvenience.
@@ -285,6 +287,7 @@ export function getPostVisitSummaryHtml(params: {
   medicationSchedule: string;
   followUpSteps: string;
 }): string {
+  const doctorDisplay = formatDoctorName(params.doctorName);
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
     <div style="text-align: center; margin-bottom: 24px;">
@@ -294,7 +297,7 @@ export function getPostVisitSummaryHtml(params: {
     
     <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
       <h2 style="color: #0f172a; font-size: 18px; margin-top: 0;">Hello ${params.patientName},</h2>
-      <p style="color: #334155;">Here is your patient-friendly summary from your consultation with Dr. ${params.doctorName} on ${params.date}:</p>
+      <p style="color: #334155;">Here is your patient-friendly summary from your consultation with ${doctorDisplay} on ${params.date}:</p>
       
       <div style="margin: 16px 0;">
         <h3 style="color: #1e40af; font-size: 15px; margin-bottom: 6px;">Diagnosis & Clinical Explanation</h3>
@@ -308,8 +311,12 @@ export function getPostVisitSummaryHtml(params: {
 
       <div style="margin: 16px 0;">
         <h3 style="color: #1e40af; font-size: 15px; margin-bottom: 6px;">Follow-up Instructions & Next Steps</h3>
-        <pre style="white-space: pre-wrap; font-family: inherit; color: #334155; line-height: 1.5; background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 6px; margin: 0;">${params.followUpSteps}</pre>
+        <p style="color: #334155; line-height: 1.6; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; margin: 0;">${params.followUpSteps}</p>
       </div>
+
+      <p style="color: #64748b; font-size: 13px; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+        For any medical emergencies, please visit the emergency room immediately. You can view this summary and all prescriptions anytime in your patient dashboard.
+      </p>
     </div>
   </div>`;
 }

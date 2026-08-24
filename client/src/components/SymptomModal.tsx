@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TimeSlot, DoctorListItem } from '../types';
 import { api } from '../api/client';
 import { Clock, AlertTriangle, Sparkles, CheckCircle, Calendar, Download, X } from 'lucide-react';
+import { formatDoctorName } from '../utils/format';
 
 interface SymptomModalProps {
   doctor: DoctorListItem;
@@ -115,7 +116,7 @@ export const SymptomModal: React.FC<SymptomModalProps> = ({
               {bookingResult ? 'Appointment Confirmed!' : 'Pre-Visit Symptom Questionnaire'}
             </h3>
             <p className="text-xs text-on-surface-variant mt-0.5">
-              {doctor.name?.startsWith('Dr.') ? doctor.name : `Dr. ${doctor.name}`} • {doctor.specialization}
+              {formatDoctorName(doctor.name)} • {doctor.specialization}
             </p>
           </div>
           <button

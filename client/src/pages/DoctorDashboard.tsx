@@ -7,6 +7,7 @@ import { AIInsightsModal } from '../components/AIInsightsModal';
 import { Sidebar } from '../components/Sidebar';
 import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
+import { formatDoctorName } from '../utils/format';
 
 export const DoctorDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -98,7 +99,7 @@ export const DoctorDashboard: React.FC = () => {
         <div className="glass-card backdrop-blur-lg rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="font-heading font-extrabold text-2xl md:text-3xl text-white mb-1">
-              {user?.name?.startsWith('Dr.') ? user.name : `Dr. ${user?.name}`}
+              {formatDoctorName(user?.name)}
             </h2>
             <div className="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
               <span className="flex items-center gap-1.5 text-primary">

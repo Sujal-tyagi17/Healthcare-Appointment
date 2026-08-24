@@ -12,6 +12,7 @@ import { AIInsightsModal } from '../components/AIInsightsModal';
 import { Sidebar } from '../components/Sidebar';
 import { TopAppBar } from '../components/TopAppBar';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
+import { formatDoctorName } from '../utils/format';
 
 const DOCTOR_AVATARS: Record<string, string> = {
   'Cardiology': 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80',
@@ -553,7 +554,7 @@ export const PatientDashboard: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2.5">
                         <span className="font-heading font-extrabold text-base text-white">
-                          {apt.doctor?.name?.startsWith('Dr.') ? apt.doctor.name : `Dr. ${apt.doctor?.name}`}
+                          {formatDoctorName(apt.doctor?.name)}
                         </span>
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/25 font-heading">
                           {apt.doctor?.specialization}
@@ -651,7 +652,7 @@ export const PatientDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {medications.map(med => {
-                const doctorDisplayName = med.doctorName?.startsWith('Dr.') ? med.doctorName : `Dr. ${med.doctorName}`;
+                const doctorDisplayName = formatDoctorName(med.doctorName);
                 return (
                   <div key={med.id} className="glass-card rounded-2xl p-5 border border-white/10 space-y-3 relative overflow-hidden">
                     <div className="flex items-start justify-between gap-4">

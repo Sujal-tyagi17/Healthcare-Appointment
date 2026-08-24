@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
-import { sendEmailNotification, getDoctorLeaveCancellationHtml } from '../services/email.service.js';
+import { sendEmailNotification, getDoctorLeaveCancellationHtml, formatDoctorName } from '../services/email.service.js';
 
 const router = Router();
 
@@ -219,10 +219,11 @@ router.post('/doctors/:id/leave', async (req, res) => {
       const rescheduleUrl = `${clientAppUrl}/reschedule/${apt.id}?doctorId=${doctorId}`;
 
       // Dispatch urgent leave notification email
+      const doctorDisplayName = formatDoctorName(doctor.name);
       await sendEmailNotification({
         recipientEmail: apt.patient.email,
         recipientName: apt.patient.name,
-        subject: `URGENT: Your appointment with Dr. ${doctor.name} on ${leaveDate} needs to be rescheduled`,
+        subject: `URGENT: Your appointment with ${doctorDisplayName} on ${leaveDate} needs to be rescheduled`,
         type: 'DOCTOR_LEAVE_ALERT',
         appointmentId: apt.id,
         html: getDoctorLeaveCancellationHtml({
