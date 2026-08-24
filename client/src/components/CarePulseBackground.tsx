@@ -1,12 +1,8 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
 
 export const CarePulseBackground: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
   return (
-    <div className={`carepulse-bg ${isDark ? 'dark-bg' : 'light-bg'}`} aria-hidden="true">
+    <div className="carepulse-bg dark-bg" aria-hidden="true">
       {/* Ambient Gradient Glows */}
       <div className="bg-glow bg-glow-blue" />
       <div className="bg-glow bg-glow-purple" />

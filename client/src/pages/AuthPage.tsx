@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
-import { ThemeToggle } from '../components/ThemeToggle';
 
 export const AuthPage: React.FC = () => {
   const { login, register, switchDemoUser } = useAuth();
@@ -50,20 +49,17 @@ export const AuthPage: React.FC = () => {
 
       {/* Left Split Screen: Interactive Clinical Intelligence Showcase */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 relative z-10">
-        {/* Brand Header with Theme Toggle */}
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary via-primary-container to-secondary flex items-center justify-center text-white shadow-neon-cyan border border-white/20">
-              <span className="material-symbols-outlined text-2xl font-bold">vital_signs</span>
-            </div>
-            <div>
-              <h1 className="font-heading font-extrabold text-2xl text-on-surface tracking-tight">
-                CarePulse
-              </h1>
-              <p className="text-xs text-on-surface-variant font-medium">Next-Generation Healthcare Intelligence &amp; Scheduling</p>
-            </div>
+        {/* Brand Header */}
+        <div className="flex items-center gap-3.5 mb-6">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary via-primary-container to-secondary flex items-center justify-center text-white shadow-neon-cyan border border-white/20">
+            <span className="material-symbols-outlined text-2xl font-bold">vital_signs</span>
           </div>
-          <ThemeToggle showLabel />
+          <div>
+            <h1 className="font-heading font-extrabold text-2xl text-on-surface tracking-tight">
+              CarePulse
+            </h1>
+            <p className="text-xs text-on-surface-variant font-medium">Next-Generation Healthcare Intelligence &amp; Scheduling</p>
+          </div>
         </div>
 
         {/* Hero Value Statement */}

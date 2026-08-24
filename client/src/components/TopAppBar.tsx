@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ThemeToggle } from './ThemeToggle';
 
 interface TopAppBarProps {
   searchQuery?: string;
@@ -18,7 +17,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
   const { user } = useAuth();
 
   return (
-    <header className="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-6 h-16 z-30 bg-surface/90 backdrop-blur-xl border-b border-outline-variant shadow-sm transition-colors duration-300">
+    <header className="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-6 h-16 z-30 bg-surface/90 backdrop-blur-xl border-b border-outline-variant shadow-md">
       {/* Search Input on Left */}
       <div className="flex items-center gap-4 flex-1">
         <div className="relative w-full max-w-md hidden sm:block focus-within:ring-2 focus-within:ring-primary/50 transition-all rounded-full">
@@ -38,9 +37,6 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
 
       {/* Trailing Icon Actions & User Profile */}
       <div className="flex items-center gap-2">
-        {/* Dark/Light Theme Toggle */}
-        <ThemeToggle />
-
         <button
           className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all relative"
           title="Notifications"
