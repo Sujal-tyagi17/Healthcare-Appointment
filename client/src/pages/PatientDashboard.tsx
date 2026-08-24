@@ -188,6 +188,19 @@ export const PatientDashboard: React.FC = () => {
     }
   };
 
+  // Toggle Medication Reminder Alarm
+  const handleToggleMedication = async (medId: string) => {
+    try {
+      // Optimistic local state update
+      setMedications(prev => prev.map(m => m.id === medId ? { ...m, isActive: !m.isActive } : m));
+      const res = await api.toggleMedicationReminder(medId);
+      setMedications(prev => prev.map(m => m.id === medId ? { ...m, isActive: res.isActive } : m));
+    } catch (err) {
+      console.error('Failed to toggle medication reminder:', err);
+      refreshUserData();
+    }
+  };
+
   const activeMedsCount = medications.filter(m => m.isActive).length;
 
   return (
@@ -625,46 +638,74 @@ export const PatientDashboard: React.FC = () => {
             <div className="glass-card p-5 rounded-2xl flex items-center justify-between">
               <div>
                 <h3 className="font-heading font-extrabold text-lg text-white">Active Medication Schedules & Alerts</h3>
-                <p className="text-xs text-on-surface-variant mt-0.5">Automated email alerts are dispatched at your prescribed daily dose timings.</p>
+                <p className="text-xs text-on-surface-variant mt-0.5">Automated email alerts are dispatched at your prescribed daily dose timings. Use the switches below to enable/disable daily alarms.</p>
               </div>
               <button
                 onClick={refreshUserData}
                 disabled={loadingUserData}
-                className="px-4 py-2 bg-tertiary/15 hover:bg-tertiary/25 text-tertiary border border-tertiary/30 rounded-xl text-xs font-heading font-bold transition-all"
+                className="px-4 py-2 bg-tertiary/15 hover:bg-tertiary/25 text-tertiary border border-tertiary/30 rounded-xl text-xs font-heading font-bold transition-all flex items-center gap-1.5"
               >
-                Refresh
+                <span className="material-symbols-outlined text-sm">refresh</span> Refresh
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {medications.map(med => (
-                <div key={med.id} className="glass-card rounded-2xl p-5 border border-white/10 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary border border-tertiary/30 font-heading">
-                        {med.dosage} • {med.frequency}
-                      </span>
-                      <h4 className="font-heading font-extrabold text-base text-white mt-1.5">{med.medicineName}</h4>
-                      <p className="text-xs text-on-surface-variant">Prescribed by Dr. {med.doctorName}</p>
-                    </div>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg font-heading ${med.isActive ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container text-on-surface-variant'}`}>
-                      {med.isActive ? 'Active' : 'Paused'}
-                    </span>
-                  </div>
+              {medications.map(med => {
+                const doctorDisplayName = med.doctorName?.startsWith('Dr.') ? med.doctorName : `Dr. ${med.doctorName}`;
+                return (
+                  <div key={med.id} className="glass-card rounded-2xl p-5 border border-white/10 space-y-3 relative overflow-hidden">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary border border-tertiary/30 font-heading">
+                          {med.dosage} • {med.frequency}
+                        </span>
+                        <h4 className="font-heading font-extrabold text-base text-white mt-1.5">{med.medicineName}</h4>
+                        <p className="text-xs text-on-surface-variant">Prescribed by {doctorDisplayName}</p>
+                      </div>
 
-                  <div className="bg-surface-container p-3 rounded-xl text-xs space-y-1.5 border border-white/5">
-                    <div className="flex justify-between text-on-surface-variant">
-                      <span>Daily Alert Times:</span>
-                      <span className="font-mono font-bold text-tertiary">{med.reminderTimes?.join(', ') || '09:00'}</span>
+                      {/* Interactive Alarm Toggle Switch */}
+                      <div className="flex flex-col items-end gap-1.5">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={med.isActive}
+                          onClick={() => handleToggleMedication(med.id)}
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            med.isActive ? 'bg-tertiary shadow-neon-ai' : 'bg-surface-container-highest'
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              med.isActive ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                        <span className={`text-[10px] font-heading font-bold ${med.isActive ? 'text-tertiary' : 'text-on-surface-variant'}`}>
+                          {med.isActive ? 'Alarm Active' : 'Alarm Paused'}
+                        </span>
+                      </div>
                     </div>
-                    {med.instructions && (
-                      <p className="text-on-surface-variant pt-1 border-t border-white/5">
-                        <strong className="text-white">Instructions: </strong>{med.instructions}
-                      </p>
-                    )}
+
+                    <div className="bg-surface-container p-3 rounded-xl text-xs space-y-1.5 border border-white/5">
+                      <div className="flex justify-between items-center text-on-surface-variant">
+                        <span className="flex items-center gap-1.5">
+                          <span className={`material-symbols-outlined text-sm ${med.isActive ? 'text-tertiary' : 'text-on-surface-variant'}`}>
+                            {med.isActive ? 'alarm_on' : 'alarm_off'}
+                          </span>
+                          Daily Alert Times:
+                        </span>
+                        <span className="font-mono font-bold text-tertiary">{med.reminderTimes?.join(', ') || '09:00'}</span>
+                      </div>
+                      {med.instructions && (
+                        <p className="text-on-surface-variant pt-1.5 border-t border-white/5 leading-relaxed">
+                          <strong className="text-white">Instructions: </strong>{med.instructions}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {medications.length === 0 && (
                 <div className="col-span-2 text-center py-16 glass-card rounded-2xl text-xs text-on-surface-variant">
