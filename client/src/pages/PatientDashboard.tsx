@@ -295,7 +295,7 @@ export const PatientDashboard: React.FC = () => {
                   </div>
 
                   {/* Search Input */}
-                  <div className="relative min-w-[220px]">
+                  <div className="relative min-w-[240px]">
                     <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">
                       search
                     </span>
@@ -303,14 +303,50 @@ export const PatientDashboard: React.FC = () => {
                       type="text"
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      placeholder="Search doctor or clinic..."
-                      className="w-full bg-surface-container/60 text-on-surface border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary rounded-full pl-10 pr-4 py-2 text-xs outline-none transition-all placeholder:text-on-surface-variant/70"
+                      placeholder="Search doctor, specialty, or clinic..."
+                      className="w-full bg-surface-container/60 text-on-surface border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary rounded-full pl-10 pr-9 py-2 text-xs outline-none transition-all placeholder:text-on-surface-variant/70"
                     />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-white p-0.5"
+                        title="Clear search"
+                      >
+                        <span className="material-symbols-outlined text-sm">close</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {/* Doctor Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Doctor Grid or Empty State */}
+                {doctors.length === 0 ? (
+                  <div className="glass-card rounded-2xl p-10 flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant/60 border border-outline-variant">
+                      <span className="material-symbols-outlined text-3xl">person_search</span>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white font-heading">No Specialists Found</h3>
+                      <p className="text-xs text-on-surface-variant mt-1 max-w-sm">
+                        {searchQuery && selectedSpec !== 'ALL'
+                          ? `No doctors found matching "${searchQuery}" in ${selectedSpec}. Try searching across All Specialties.`
+                          : searchQuery
+                          ? `No doctors found matching "${searchQuery}".`
+                          : `No doctors currently available in ${selectedSpec}.`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedSpec('ALL');
+                      }}
+                      className="bg-primary hover:bg-primary-container text-on-primary font-heading font-bold text-xs px-5 py-2.5 rounded-full transition-all shadow-neon-cyan flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-sm">restart_alt</span>
+                      <span>Show All Specialists</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {doctors.map(doc => {
                     const isSelected = selectedDoctor?.id === doc.id;
                     const avatarUrl = DOCTOR_AVATARS[doc.specialization] || DOCTOR_AVATARS['General Medicine'];
@@ -381,7 +417,8 @@ export const PatientDashboard: React.FC = () => {
                     );
                   })}
                 </div>
-              </section>
+              )}
+            </section>
             </div>
 
             {/* Right Column: Sidebar Preview (Expanded Booking & Slots Panel) */}

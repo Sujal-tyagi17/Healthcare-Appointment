@@ -38,27 +38,11 @@ router.get('/', async (req, res) => {
   try {
     const { search, specialization } = req.query;
 
-    const whereClause: any = {
-      role: 'DOCTOR',
-      doctorProfile: { isNot: null }
-    };
-
-    if (search) {
-      whereClause.OR = [
-        { name: { contains: String(search) } },
-        { doctorProfile: { specialization: { contains: String(search) } } }
-      ];
-    }
-
-    if (specialization && specialization !== 'ALL') {
-      whereClause.doctorProfile = {
-        ...whereClause.doctorProfile,
-        specialization: String(specialization)
-      };
-    }
-
     const doctors = await prisma.user.findMany({
-      where: whereClause,
+      where: {
+        role: 'DOCTOR',
+        doctorProfile: { isNot: null }
+      },
       include: {
         doctorProfile: true,
         doctorLeaves: {
@@ -68,7 +52,29 @@ router.get('/', async (req, res) => {
       orderBy: { name: 'asc' }
     });
 
-    const formatted = doctors.map(doc => ({
+    let filtered = doctors;
+
+    // Filter by specialization if not ALL
+    if (specialization && String(specialization).trim().toUpperCase() !== 'ALL') {
+      const specFilter = String(specialization).trim().toLowerCase();
+      filtered = filtered.filter(doc => 
+        doc.doctorProfile?.specialization?.toLowerCase() === specFilter
+      );
+    }
+
+    // Case-insensitive search across name, specialization, bio, and room
+    if (search && String(search).trim()) {
+      const q = String(search).trim().toLowerCase();
+      filtered = filtered.filter(doc => {
+        const nameMatch = doc.name?.toLowerCase().includes(q);
+        const specMatch = doc.doctorProfile?.specialization?.toLowerCase().includes(q);
+        const bioMatch = doc.doctorProfile?.bio?.toLowerCase().includes(q);
+        const roomMatch = doc.doctorProfile?.roomNumber?.toLowerCase().includes(q);
+        return nameMatch || specMatch || bioMatch || roomMatch;
+      });
+    }
+
+    const formatted = filtered.map(doc => ({
       id: doc.id,
       name: doc.name,
       email: doc.email,
