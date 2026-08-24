@@ -85,3 +85,5 @@ app.listen(PORT, () => {
 
   startBackgroundSchedulers();
 });
+
+export default app;
