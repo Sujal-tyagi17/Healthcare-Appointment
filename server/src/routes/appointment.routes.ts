@@ -7,6 +7,7 @@ import { AuthRequest } from '../types.js';
 import { generatePreVisitSummary } from '../services/llm.service.js';
 import { sendEmailNotification, getBookingConfirmationHtml, formatDoctorName } from '../services/email.service.js';
 import { syncGoogleCalendarEvent, generateIcsContent, deleteGoogleCalendarEvent } from '../services/calendar.service.js';
+import { getISTDateAndTime } from './doctor.routes.js';
 
 const router = Router();
 
@@ -22,6 +23,15 @@ router.post('/hold', requireAuth, async (req: AuthRequest, res) => {
   try {
     const data = holdSlotSchema.parse(req.body);
     const patientId = req.user!.id;
+
+    // Check if slot has already passed in IST
+    const { todayIST, nowISTTime } = getISTDateAndTime();
+    if (data.date < todayIST || (data.date === todayIST && data.startTime <= nowISTTime)) {
+      return res.status(400).json({
+        success: false,
+        message: 'This consultation time slot has already passed. Please select an upcoming slot.'
+      });
+    }
 
     // Check if doctor is on leave
     const leave = await prisma.doctorLeave.findUnique({

@@ -57,7 +57,7 @@ export const PatientDashboard: React.FC = () => {
   const [medications, setMedications] = useState<MedicationReminderItem[]>([]);
   const [loadingUserData, setLoadingUserData] = useState(false);
 
-  // Generate 7-day strip
+  // Generate 7-day strip (Local / IST timezone accurate)
   useEffect(() => {
     const list = [];
     const now = new Date();
@@ -66,10 +66,16 @@ export const PatientDashboard: React.FC = () => {
       d.setDate(now.getDate() + i);
       const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNum = d.getDate();
-      const fullDate = d.toISOString().split('T')[0];
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const fullDate = `${year}-${month}-${day}`;
       list.push({ dayName, dayNum, fullDate });
     }
     setDateList(list);
+    if (list.length > 0) {
+      setSelectedDate(list[0].fullDate);
+    }
   }, []);
 
   // Load Doctors & Specializations
@@ -505,34 +511,64 @@ export const PatientDashboard: React.FC = () => {
                             <p className="text-on-surface-variant">{availability.leaveReason || 'Unavailable on this date.'}</p>
                           </div>
                         ) : (
-                          <div className="grid grid-cols-3 gap-2">
-                            {availability?.slots.map((slot, idx) => {
-                              const isPicked = selectedSlot?.startTime === slot.startTime;
-                              return (
-                                <button
-                                  key={idx}
-                                  disabled={!slot.isAvailable || holdingSlot}
-                                  onClick={() => handleSlotPick(slot)}
-                                  className={`py-2.5 px-2 rounded-lg text-xs font-heading font-bold transition-all border ${
-                                    isPicked
-                                      ? 'bg-primary text-on-primary border-primary shadow-neon-cyan ring-1 ring-primary'
-                                      : slot.status === 'AVAILABLE'
-                                      ? 'bg-surface-container/60 hover:bg-primary/20 hover:border-primary border-outline-variant/40 text-white'
-                                      : slot.status === 'HELD'
-                                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 cursor-not-allowed'
-                                      : 'bg-surface-container-lowest/40 border-white/5 text-slate-600 line-through cursor-not-allowed'
-                                  }`}
-                                >
-                                  <span>{slot.startTime}</span>
-                                </button>
-                              );
-                            })}
-
-                            {availability?.slots.length === 0 && (
-                              <div className="col-span-3 py-6 text-center text-xs text-on-surface-variant bg-surface-container/30 rounded-xl">
-                                No consultation slots available on this date.
+                          <div className="flex flex-col gap-2">
+                            {/* Passed Day Banner */}
+                            {availability && availability.slots.length > 0 && availability.slots.every(s => !s.isAvailable && s.status === 'PAST') && (
+                              <div className="p-3 bg-cyan-500/10 border border-cyan-500/25 rounded-xl text-center space-y-1">
+                                <div className="flex items-center justify-center gap-1.5 text-cyan-400 font-heading font-bold text-xs">
+                                  <span className="material-symbols-outlined text-base">schedule</span>
+                                  <span>Today's Consultation Hours Have Ended</span>
+                                </div>
+                                <p className="text-[11px] text-slate-300">
+                                  Please select an upcoming date (e.g. tomorrow) above to book your appointment.
+                                </p>
                               </div>
                             )}
+
+                            <div className="grid grid-cols-3 gap-2">
+                              {availability?.slots.map((slot, idx) => {
+                                const isPicked = selectedSlot?.startTime === slot.startTime;
+                                const isPast = slot.status === 'PAST';
+                                const isBooked = slot.status === 'BOOKED';
+                                const isHeld = slot.status === 'HELD';
+
+                                return (
+                                  <button
+                                    key={idx}
+                                    disabled={!slot.isAvailable || holdingSlot}
+                                    onClick={() => handleSlotPick(slot)}
+                                    title={
+                                      isPast
+                                        ? 'Time slot has already passed for today (IST)'
+                                        : isBooked
+                                        ? 'Slot already booked'
+                                        : isHeld
+                                        ? 'Slot temporarily held'
+                                        : 'Available slot'
+                                    }
+                                    className={`py-2.5 px-2 rounded-lg text-xs font-heading font-bold transition-all border ${
+                                      isPicked
+                                        ? 'bg-primary text-on-primary border-primary shadow-neon-cyan ring-1 ring-primary'
+                                        : slot.isAvailable
+                                        ? 'bg-surface-container/60 hover:bg-primary/20 hover:border-primary border-outline-variant/40 text-white'
+                                        : isHeld
+                                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 cursor-not-allowed'
+                                        : isBooked
+                                        ? 'bg-red-500/10 border-red-500/20 text-red-300/70 line-through cursor-not-allowed'
+                                        : 'bg-surface-container-lowest/30 border-white/5 text-slate-600 line-through cursor-not-allowed opacity-40'
+                                    }`}
+                                  >
+                                    <span>{slot.startTime}</span>
+                                  </button>
+                                );
+                              })}
+
+                              {availability?.slots.length === 0 && (
+                                <div className="col-span-3 py-6 text-center text-xs text-on-surface-variant bg-surface-container/30 rounded-xl">
+                                  No consultation slots available on this date.
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -551,6 +587,8 @@ export const PatientDashboard: React.FC = () => {
                             ? 'Reserving Slot...'
                             : selectedSlot
                             ? `Confirm & Book Appointment (${selectedSlot.startTime})`
+                            : availability?.slots && availability.slots.every(s => !s.isAvailable)
+                            ? 'Pick An Upcoming Date Above'
                             : 'Select Time Slot & Book'}
                         </span>
                         <span className="material-symbols-outlined text-base">arrow_forward</span>

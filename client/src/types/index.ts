@@ -40,7 +40,8 @@ export interface TimeSlot {
   endTime: string;
   isAvailable: boolean;
   isHeld: boolean;
-  status: 'AVAILABLE' | 'HELD' | 'BOOKED';
+  isPast?: boolean;
+  status: 'AVAILABLE' | 'HELD' | 'BOOKED' | 'PAST';
 }
 
 export interface PreVisitSummary {

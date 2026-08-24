@@ -109,6 +109,25 @@ router.get('/specializations', async (_req, res) => {
   }
 });
 
+// Helper to get current IST date (YYYY-MM-DD) and time (HH:mm)
+export function getISTDateAndTime(): { todayIST: string; nowISTTime: string } {
+  const now = new Date();
+  // IST is UTC + 5 hours 30 minutes
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffsetMs);
+  
+  const year = istDate.getUTCFullYear();
+  const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(istDate.getUTCDate()).padStart(2, '0');
+  const todayIST = `${year}-${month}-${day}`;
+
+  const hours = String(istDate.getUTCHours()).padStart(2, '0');
+  const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
+  const nowISTTime = `${hours}:${minutes}`;
+
+  return { todayIST, nowISTTime };
+}
+
 // 3. Get doctor schedule & available slots for a specific date
 router.get('/:doctorId/availability', async (req, res) => {
   try {
@@ -172,15 +191,33 @@ router.get('/:doctorId/availability', async (req, res) => {
 
     const heldTimes = new Map(activeHolds.map(h => [h.startTime, h.patientId]));
 
+    // Real-time IST current timestamp evaluation
+    const { todayIST, nowISTTime } = getISTDateAndTime();
+    const isPastDate = dateStr < todayIST;
+    const isToday = dateStr === todayIST;
+
     const computedSlots = allSlots.map(slot => {
       const isBooked = bookedTimes.has(slot.start);
       const isHeld = heldTimes.has(slot.start);
+      // If date is in the past, or if today and start time has passed in IST
+      const isSlotPassed = isPastDate || (isToday && slot.start <= nowISTTime);
+
+      let status = 'AVAILABLE';
+      if (isSlotPassed) {
+        status = 'PAST';
+      } else if (isBooked) {
+        status = 'BOOKED';
+      } else if (isHeld) {
+        status = 'HELD';
+      }
+
       return {
         startTime: slot.start,
         endTime: slot.end,
-        isAvailable: !isBooked && !isHeld,
-        isHeld: isHeld,
-        status: isBooked ? 'BOOKED' : isHeld ? 'HELD' : 'AVAILABLE'
+        isAvailable: !isSlotPassed && !isBooked && !isHeld,
+        isHeld: isHeld && !isSlotPassed,
+        isPast: isSlotPassed,
+        status
       };
     });
 
@@ -188,6 +225,8 @@ router.get('/:doctorId/availability', async (req, res) => {
       success: true,
       isOnLeave: false,
       date: dateStr,
+      isToday,
+      currentISTTime: nowISTTime,
       doctor: {
         id: doctor.id,
         name: doctor.name,
