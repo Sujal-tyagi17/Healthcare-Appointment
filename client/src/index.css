@@ -3,17 +3,42 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-base: #070e1e;
+    --bg-surface: #0b1326;
+    --bg-surface-container: #131d36;
+    --bg-surface-container-high: #1a2747;
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-focus: rgba(14, 165, 233, 0.4);
+  }
+
+  html.light {
+    --bg-base: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-container: #ffffff;
+    --bg-surface-container-high: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-subtle: rgba(226, 232, 240, 0.9);
+    --border-focus: rgba(14, 165, 233, 0.6);
+  }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #0b1326;
-    color: #dae2fd;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
     letter-spacing: -0.015em;
   }
 }
 
+/* Glass Card Theming */
 .glass-card {
   background: rgba(11, 19, 38, 0.75);
   backdrop-filter: blur(24px);
@@ -27,13 +52,36 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06);
+}
+
+html.light .glass-card:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Panel Theming */
 .glass-panel {
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(30, 41, 59, 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.08);
+}
+
+/* Gradients */
 .ai-gradient-text, .gradient-text-ai {
   background: linear-gradient(135deg, #d0bcff 0%, #89ceff 100%);
   -webkit-background-clip: text;
@@ -41,73 +89,23 @@
   background-clip: text;
 }
 
-.ai-gradient-border {
-  position: relative;
-}
-
-.ai-gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(87, 27, 193, 0.5), rgba(14, 165, 233, 0.5));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.lift-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-}
-
-.lift-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  background-color: rgba(45, 52, 73, 0.5);
-}
-
-.floating-input {
-  position: relative;
-}
-
-.floating-input input {
-  padding: 1.5rem 1rem 0.5rem;
-}
-
-.floating-input label {
-  position: absolute;
-  top: 50%;
-  left: 1rem;
-  transform: translateY(-50%);
-  transition: all 0.2s ease-in-out;
-  pointer-events: none;
-  color: #bec8d2;
-}
-
-.floating-input input:focus + label,
-.floating-input input:not(:placeholder-shown) + label {
-  top: 0.5rem;
-  transform: translateY(0) scale(0.85);
-  transform-origin: left top;
-  color: #89ceff;
-}
-
-.role-pill {
-  transition: all 0.3s ease;
-}
-
-.role-pill.active {
-  background: rgba(14, 165, 233, 0.15);
-  color: #89ceff;
-  border-color: #89ceff;
+html.light .ai-gradient-text, html.light .gradient-text-ai {
+  background: linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .ai-gradient-card {
   background: linear-gradient(135deg, rgba(87, 27, 193, 0.18), rgba(14, 165, 233, 0.12));
   backdrop-filter: blur(20px);
   border: 1px solid rgba(208, 188, 255, 0.25);
+}
+
+html.light .ai-gradient-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(14, 165, 233, 0.06));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.25);
 }
 
 .ai-gradient-button {
@@ -121,6 +119,71 @@
   box-shadow: 0 8px 20px -4px rgba(139, 92, 246, 0.4);
 }
 
+/* Light mode text & surface adaptors */
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-on-surface-variant {
+  color: #64748b !important;
+}
+
+html.light .bg-surface {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-surface-dim {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-surface-container {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-surface-container-high {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-surface-container-low,
+html.light .bg-surface-container-lowest {
+  background-color: #ffffff !important;
+}
+
+html.light .border-white\/10, 
+html.light .border-white\/5 {
+  border-color: rgba(226, 232, 240, 0.85) !important;
+}
+
+html.light .border-outline-variant\/30,
+html.light .border-outline-variant\/20,
+html.light .border-outline-variant\/40 {
+  border-color: rgba(226, 232, 240, 0.9) !important;
+}
+
+html.light input, html.light select, html.light textarea {
+  color: #0f172a !important;
+}
+
+html.light input::placeholder, html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
 /* Hide scrollbar utility */
 .hide-scrollbar::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -129,20 +192,3 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-/* Custom clinical scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0b1326;
-}
-::-webkit-scrollbar-thumb {
-  background: #2d3449;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3e4850;
-}
-

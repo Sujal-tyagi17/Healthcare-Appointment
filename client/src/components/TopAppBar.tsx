@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { ThemeToggle } from './ThemeToggle';
 
 interface TopAppBarProps {
   searchQuery?: string;
@@ -37,6 +38,9 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
 
       {/* Trailing Icon Actions & User Profile */}
       <div className="flex items-center gap-2">
+        {/* Dark/Light Theme Toggle */}
+        <ThemeToggle />
+
         <button
           className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all relative"
           title="Notifications"

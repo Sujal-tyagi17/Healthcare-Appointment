@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FluidShaderCanvas } from '../components/FluidShaderCanvas';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export const AuthPage: React.FC = () => {
   const { login, register, switchDemoUser } = useAuth();
@@ -46,6 +47,11 @@ export const AuthPage: React.FC = () => {
     <div className="min-h-screen flex flex-col lg:flex-row selection:bg-primary/30 selection:text-primary text-on-surface relative overflow-x-hidden">
       {/* Background Fluid Shader */}
       <FluidShaderCanvas />
+
+      {/* Floating Theme Toggle (Top-Right) */}
+      <div className="absolute top-5 right-5 sm:top-7 sm:right-7 z-30">
+        <ThemeToggle showLabel />
+      </div>
 
       {/* Left Split Screen: Interactive Clinical Intelligence Showcase */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 relative z-10">
