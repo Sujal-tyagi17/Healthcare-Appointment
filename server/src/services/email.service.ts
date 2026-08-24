@@ -155,6 +155,14 @@ export async function retryFailedNotifications(): Promise<number> {
   return processedCount;
 }
 
+/**
+ * Cleanly format doctor names to guarantee exactly one "Dr." prefix
+ */
+export function formatDoctorName(name: string = ''): string {
+  const cleaned = (name || '').replace(/^(Dr\.?\s*)+/i, '').trim();
+  return cleaned ? `Dr. ${cleaned}` : 'Doctor';
+}
+
 // ---------------- HTML EMAIL TEMPLATES ---------------- //
 
 export function getBookingConfirmationHtml(params: {
