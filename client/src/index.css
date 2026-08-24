@@ -192,3 +192,217 @@ html.light input::placeholder, html.light textarea::placeholder {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ===================================================
+   CarePulse Interactive Medical Background Styles
+   =================================================== */
+.carepulse-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -10;
+  transition: background-color 0.5s ease;
+}
+
+.carepulse-bg.dark-bg {
+  background-color: #070e1e;
+}
+
+.carepulse-bg.light-bg {
+  background-color: #f8fafc;
+}
+
+/* Ambient Floating Glow Orbs */
+.bg-glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  pointer-events: none;
+  animation: floatGlow 10s ease-in-out infinite alternate;
+}
+
+.bg-glow-blue {
+  top: -10%;
+  left: 10%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.22), transparent 70%);
+}
+
+.bg-glow-purple {
+  bottom: 5%;
+  right: 5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18), transparent 70%);
+  animation-delay: -3s;
+}
+
+.bg-glow-cyan {
+  top: 35%;
+  right: 25%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.16), transparent 70%);
+  animation-delay: -6s;
+}
+
+.light-bg .bg-glow-blue {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25), transparent 70%);
+}
+
+.light-bg .bg-glow-purple {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.18), transparent 70%);
+}
+
+.light-bg .bg-glow-cyan {
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.2), transparent 70%);
+}
+
+@keyframes floatGlow {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -25px) scale(1.08); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* Background Precision Grid */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+.light-bg .bg-grid {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+}
+
+/* Background Dot Matrix */
+.bg-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.light-bg .bg-dots {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+}
+
+/* Animated Clinical ECG Heartbeat Pulse Line */
+.bg-ecg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 260px;
+  opacity: 0.22;
+}
+
+.light-bg .bg-ecg {
+  opacity: 0.28;
+}
+
+.ecg-path {
+  fill: none;
+  stroke: #0ea5e9;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: ecgPulse 6s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.8));
+}
+
+.light-bg .ecg-path {
+  stroke: #0284c7;
+  filter: drop-shadow(0 0 6px rgba(2, 132, 199, 0.5));
+}
+
+@keyframes ecgPulse {
+  0% {
+    stroke-dashoffset: 2000;
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.3;
+  }
+}
+
+/* Floating Ambient Bio-Particles */
+.bg-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bg-particles span {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  background: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.6);
+  animation: floatParticle 14s infinite linear;
+}
+
+.light-bg .bg-particles span {
+  background: rgba(2, 132, 199, 0.45);
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
+}
+
+.bg-particles span:nth-child(1) { left: 12%; width: 4px; height: 4px; animation-duration: 16s; animation-delay: 0s; }
+.bg-particles span:nth-child(2) { left: 28%; width: 6px; height: 6px; animation-duration: 19s; animation-delay: 2s; }
+.bg-particles span:nth-child(3) { left: 45%; width: 3px; height: 3px; animation-duration: 13s; animation-delay: 4s; }
+.bg-particles span:nth-child(4) { left: 62%; width: 5px; height: 5px; animation-duration: 17s; animation-delay: 1s; }
+.bg-particles span:nth-child(5) { left: 78%; width: 4px; height: 4px; animation-duration: 15s; animation-delay: 3s; }
+.bg-particles span:nth-child(6) { left: 88%; width: 6px; height: 6px; animation-duration: 21s; animation-delay: 5s; }
+.bg-particles span:nth-child(7) { left: 35%; width: 4px; height: 4px; animation-duration: 18s; animation-delay: 7s; }
+.bg-particles span:nth-child(8) { left: 70%; width: 3px; height: 3px; animation-duration: 14s; animation-delay: 6s; }
+
+@keyframes floatParticle {
+  0% {
+    bottom: -20px;
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    bottom: 105%;
+    opacity: 0;
+    transform: translateY(-50px) scale(1.2);
+  }
+}
+
+/* Background Radial Vignette */
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(7, 14, 30, 0.4) 100%);
+  pointer-events: none;
+}
+
+.light-bg .bg-vignette {
+  background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(241, 245, 249, 0.3) 100%);
+}
