@@ -208,11 +208,6 @@ export const AuthPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Footer Note */}
-        <div className="pt-4 text-xs text-on-surface-variant border-t border-white/5">
-          CarePulse Clinical Station &bull; Indian Specialists Network &bull; INR (₹) Pricing
-        </div>
       </div>
 
       {/* Right Split Screen: Authentication & Quick Test Station */}
