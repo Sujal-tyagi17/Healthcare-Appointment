@@ -1,81 +1,188 @@
-# System Design Write-Up: Healthcare Appointment & Follow-up Manager
+# CarePulse — System Design
 
-## 1. Concurrency Control & Double-Booking Prevention
+## Healthcare Appointment & Follow-up Manager
 
-Preventing double-booking in high-concurrency environments requires multi-tiered isolation to eliminate race conditions between the time a user selects a slot and commits the booking.
+CarePulse is designed around four backend reliability concerns: **double-booking prevention, temporary slot holds, doctor leave handling, and reliable notifications**.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Patient1 as Patient A
-    actor Patient2 as Patient B
-    participant API as Booking Controller
-    participant Lock as Cache / In-Memory Lock
-    participant DB as SQL Database (Transaction)
+The core principle is:
 
-    Patient1->>API: Hold Slot (Doctor ID, Date, Start Time)
-    API->>Lock: Acquire temporary hold key (TTL = 10m)
-    Lock-->>API: Hold Granted (Hold Token)
-    API-->>Patient1: Slot Reserved (Expires in 10:00)
+> **Use database constraints for consistency, durable records for reliability, and explicit states for workflows requiring human action.**
 
-    Patient2->>API: Hold Slot (Same Doctor, Date, Time)
-    API->>Lock: Check existing active hold / booking
-    Lock-->>API: Conflict Detected
-    API-->>Patient2: 409 Conflict: "Slot currently held by another patient"
+---
 
-    Patient1->>API: Confirm Booking (Token + Symptoms)
-    API->>DB: BEGIN TRANSACTION (SERIALIZABLE / Atomic)
-    DB->>DB: Check slot availability with UNIQUE constraint
-    DB->>DB: INSERT Appointment & COMMIT
-    API->>Lock: Release Hold
-    API-->>Patient1: Booking Confirmed (201 Created)
+## 1. Double-Booking Prevention
+
+A simple availability check is unsafe because two patients can check the same slot simultaneously.
+
+CarePulse uses three layers of protection.
+
+### Database Constraint
+
+The `Appointment` table has a composite unique constraint on:
+
+```text
+(doctorId, date, startTime)
 ```
 
-1. **Optimistic Temporary Slot Holds**: When a patient selects an available slot to fill symptoms, a temporary hold key is created with a 10-minute Time-To-Live (TTL). Other clients querying availability see the slot as `HELD`.
-2. **Database-Level Integrity Constraints**: The `Appointment` table enforces a composite unique constraint `UNIQUE(doctor_id, appointment_date, start_time)` filtered on non-cancelled statuses (`BOOKED`, `COMPLETED`).
-3. **Atomic Database Transactions**: The booking confirmation executes inside an ACID transaction (`prisma.$transaction` / SQL transaction with row-level locks). If two simultaneous requests pass the hold layer, the database enforces the unique constraint, failing the second request deterministically with an HTTP `409 Conflict` response.
+This is the **final guarantee** against concurrent conflicting inserts. If two requests attempt to create the same appointment, the database rejects the conflicting insert and the API returns `409 Conflict`.
+
+### Transactional Booking
+
+The booking workflow runs inside `prisma.$transaction(...)` and includes:
+
+1. Doctor lookup
+2. Leave check
+3. Appointment conflict check
+4. Appointment creation
+5. Slot-hold cleanup
+
+The transaction keeps the booking workflow consistent, while the database constraint provides the final concurrency guarantee.
+
+### Status Filtering
+
+Only `BOOKED` and `COMPLETED` appointments block a slot. `CANCELLED` and `REQUIRES_RESCHEDULE` appointments do not.
+
+**Verified:** booking the same doctor/date/time twice succeeded once and rejected the second attempt with:
+
+> This slot was just booked by another patient. Please choose another slot.
 
 ---
 
-## 2. Temporary Slot Hold Mechanism
+## 2. Slot Hold Mechanism
 
-To provide a seamless user experience during symptom input:
-- **Hold Allocation**: Requesting a slot triggers `POST /api/appointments/hold`. The system validates that the slot is within the doctor's working hours, not on a declared leave date, and has no active booking or unexpired hold.
-- **TTL Expiration**: A background reconciliation worker runs every 60 seconds to purge expired holds (`held_until < CURRENT_TIMESTAMP`). When a hold expires, the slot returns to the public availability pool automatically.
-- **Hold Renewal & Abandonment**: If the patient navigates away or cancels, an explicit `DELETE /api/appointments/hold/:token` frees the slot immediately.
+Patients may need several minutes to complete symptom details before confirming an appointment. To prevent another patient from taking the selected slot, CarePulse uses a temporary `SlotHold`.
 
----
+When a patient selects a slot:
 
-## 3. Doctor Leave Conflict Handling
-
-When an Admin or Doctor marks a doctor as on leave for a specific date or date range:
-
-1. **Atomic Leave Registration**: The leave date is saved in `DoctorLeave`. All future slot generation endpoints immediately exclude this date.
-2. **Conflicting Booking Detection**: A transactional query identifies all active appointments (`status = 'BOOKED'`) for that doctor on the affected date(s).
-3. **Batch Status Transition**: Conflicting appointments are updated in bulk to `REQUIRES_RESCHEDULE` or `CANCELLED_BY_DOCTOR`.
-4. **Automated Patient Notification & Priority Rescheduling**:
-   - For every affected appointment, an automated priority notification is pushed to the notification queue.
-   - The email contains an apology, the reason for cancellation, and a secure, pre-authenticated one-click rescheduling link granting the patient priority access to alternative slots.
-
----
-
-## 4. Notification Failure & Reliability Architecture
-
-Healthcare notifications (booking confirmations, doctor leave alerts, medication reminders) are critical and must be resilient against third-party network outages (SMTP/SendGrid/Google Calendar API downtime).
-
-```mermaid
-graph LR
-    Trigger[Event: Booking / Leave / Reminder] --> JobQueue[(Notification Queue / DB Log)]
-    JobQueue --> Worker[Background Worker / Retry Engine]
-    Worker -->|Attempt 1| Service[Email Service / Google Calendar API]
-    Service --x|Timeout / 5xx Error| Worker
-    Worker -->|Exponential Backoff: 1m, 5m, 15m| JobQueue
-    Worker -->|Attempt 2/3 Success| Recipient[Patient / Doctor Inbox]
+```http
+POST /appointments/hold
 ```
 
-- **Outbox Pattern / Database-Backed Queue**: Notification tasks are written into the `NotificationLog` table inside the triggering transaction (`status = 'PENDING'`).
-- **Idempotency**: Every notification event receives a unique deterministic key `(appointment_id, event_type, recipient_email)` to guarantee no duplicate emails are sent during retries.
-- **Exponential Backoff Worker**: A background scheduler processes pending and failed notifications:
-  - Max retry count: 3 attempts with exponential backoff intervals (1 minute, 5 minutes, 15 minutes).
-  - Dead Letter Handling: If all 3 attempts fail, the notification is marked `FAILED` with the exact error payload recorded for admin inspection.
-- **Fail-Safe LLM Processing**: LLM calls for pre-visit and post-visit summaries are wrapped in timeout-protected handlers with a deterministic heuristic fallback engine, ensuring API requests complete even during OpenAI/Gemini rate limits.
+a hold is created with:
+
+* `holdToken`
+* `doctorId`
+* `date`
+* `startTime`
+* `expiresAt`
+
+The hold lasts **10 minutes** and `holdToken` is uniquely indexed.
+
+The availability endpoint:
+
+```http
+GET /doctors/:id/availability
+```
+
+ignores expired holds using:
+
+```text
+expiresAt <= currentTime
+```
+
+A hold can be removed when:
+
+1. It expires.
+2. The patient explicitly releases it using `DELETE /hold/:holdToken`.
+3. The appointment is successfully booked, where the booking transaction removes the hold.
+
+This provides temporary slot ownership without requiring permanent locks.
+
+---
+
+## 3. Doctor Leave & Rescheduling
+
+When an administrator records doctor leave:
+
+```http
+POST /admin/doctors/:id/leave
+```
+
+the system upserts the leave record and finds affected `BOOKED` appointments for that doctor and date.
+
+Affected appointments are changed to:
+
+```text
+REQUIRES_RESCHEDULE
+```
+
+rather than `CANCELLED`.
+
+This distinction preserves the workflow: the appointment cannot proceed at the original time, but the patient still needs to select a replacement slot.
+
+Each affected patient receives a rescheduling link such as:
+
+```text
+/reschedule/:appointmentId?doctorId=...
+```
+
+The API returns:
+
+```json
+{
+  "affectedAppointmentsCount": 1,
+  "patientsNotifiedCount": 1
+}
+```
+
+**Verified:** an existing booking was correctly changed to `REQUIRES_RESCHEDULE`, with the affected appointment and notification counts reported.
+
+---
+
+## 4. Notification Failure Handling
+
+Email and calendar services can fail because of network issues, expired credentials, SMTP errors, or rate limits.
+
+CarePulse therefore uses a durable `NotificationLog` with:
+
+```text
+PENDING
+SENT
+FAILED
+```
+
+plus `retryCount` and error information.
+
+The notification is persisted before delivery is attempted:
+
+```text
+Business Operation
+       │
+       ▼
+NotificationLog (PENDING)
+       │
+       ▼
+Attempt Delivery
+    ┌──┴──┐
+    ▼     ▼
+  SENT   FAILED
+           │
+           ▼
+      Retry Worker
+```
+
+If delivery fails, the error is recorded and the parent business operation is not rolled back. For example, a failed confirmation email does not cancel a successful appointment.
+
+A background job retries `PENDING`/`FAILED` notifications until the configured retry limit is reached. The log also provides an administrative delivery audit trail and supports manual retry.
+
+---
+
+## 5. Overall Design
+
+| Concern                  | Solution                                 |
+| ------------------------ | ---------------------------------------- |
+| Concurrent bookings      | Transaction + database unique constraint |
+| Temporary slot ownership | 10-minute `SlotHold`                     |
+| Doctor leave             | `REQUIRES_RESCHEDULE` workflow           |
+| Notification failure     | Durable log + background retry           |
+| Cancelled appointments   | Status-based availability filtering      |
+
+### Key Design Principles
+
+* **Database constraints** provide final concurrency protection.
+* **Transactions** keep related booking operations consistent.
+* **Expiring holds** provide temporary reservation without permanent locks.
+* **Explicit workflow states** distinguish rescheduling from cancellation.
+* **Durable notification logs** prevent external service failures from losing notification records.
+
+Together, these mechanisms provide a relatively simple architecture that remains reliable under concurrent bookings, temporary slot reservations, doctor availability changes, and external notification failures.

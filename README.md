@@ -9,7 +9,24 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 
-An enterprise-grade healthcare appointment management system engineered with modern dark-mode clinical glassmorphism, animated WebGL GLSL fluid noise shaders, real-time AI symptom triage, post-visit clinical translations, dual calendar synchronization, and automated cron-driven medication reminder dispatchers.
+A full-stack healthcare appointment management platform engineered with modern dark-mode clinical glassmorphism, animated WebGL GLSL fluid noise shaders, real-time AI symptom triage, post-visit clinical translations, dual calendar synchronization, and automated cron-driven medication reminder dispatchers.
+
+---
+
+## 🖥️ Application Preview
+
+### Patient Portal
+![Patient Dashboard](docs/screenshots/patient-dashboard.png)
+
+### Doctor Clinical Station
+![Doctor Dashboard](docs/screenshots/doctor-dashboard.png)
+
+### Clinic Administration
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+## 🌐 Live Demo
+
+**Live Application:** [CarePulse](https://carepulse-healthcare.vercel.app)
 
 ---
 
@@ -32,7 +49,7 @@ An enterprise-grade healthcare appointment management system engineered with mod
 - **Framework**: React 18 with Vite build tool.
 - **Language**: TypeScript (Strict Mode).
 - **Styling**: Tailwind CSS with custom glassmorphism design tokens (`backdrop-blur`, neon cyan/violet glow utilities).
-- **Interactive Shader**: Custom WebGL canvas with 2D Simplex Noise fragment shader (`FluidShaderCanvas.tsx`).
+- **Interactive Background**: Custom WebGL canvas and precision clinical ECG pulse flow (`CarePulseBackground.tsx`).
 - **Iconography**: Google Material Symbols Outlined & Lucide React.
 - **State Management**: React Context API (`AuthContext`) with persistent JWT local authentication.
 
@@ -44,7 +61,7 @@ An enterprise-grade healthcare appointment management system engineered with mod
 
 ### Artificial Intelligence & Clinical Intelligence
 - **Primary Engines**: Google Gemini API (`@google/genai`) & OpenAI API (`gpt-4o-mini`).
-- **Intelligent Heuristic Fallback Engine**: Built-in deterministic clinical rule system that parses keyword urgency, formulates diagnostic inquiries, and simplifies medical prescriptions with 100% uptime even during rate limits or network outages.
+- **Intelligent Heuristic Fallback Engine**: Deterministic clinical rule-based fallback that maintains core triage functionality during AI API rate limits or temporary network failures.
 
 ### Background Automation & Communications
 - **Cron Jobs**: `node-cron` scheduled workers:
@@ -60,7 +77,7 @@ An enterprise-grade healthcare appointment management system engineered with mod
 
 ### 1. 👤 Patient Portal
 - **Specialist Matrix**: Discover Indian specialists across Cardiology, Dermatology, Neurology, General Medicine, and Pediatrics with consultation fees in INR (`₹`).
-- **Instant Slot Booking**: 1-click slot selection with real-time 10-minute temporary lock hold (`slotHold` TTL) to prevent double booking.
+- **Instant Slot Booking**: 1-click slot selection with real-time 10-minute temporary lock hold (`slotHold` TTL) and real-time IST elapsed slot protection to prevent double booking.
 - **AI Symptom Triage**: Pre-visit questionnaire assessing urgency (`LOW`, `MEDIUM`, `HIGH`) and suggesting diagnostic questions for the physician.
 - **Active Consultation Schedule**: Real-time view of upcoming visits with 1-click `.ICS` calendar downloads.
 - **Medication Reminders**: Daily prescription schedules with meal instructions and toggleable automated alerts.
@@ -75,7 +92,7 @@ An enterprise-grade healthcare appointment management system engineered with mod
 ### 3. 👑 Clinic Administration Portal
 - **4 Real-Time KPI Cards**: Active doctors, total scheduled visits, patient registrations, and email delivery success rate.
 - **Specialist Roster Manager**: Configure doctor consultation fees, room assignments, slot durations (10–120 min), and working hours.
-- **Doctor Leave & Conflict Resolution**: Mark doctor leaves with automated cancellation of conflicting bookings, status update to `REQUIRES_RESCHEDULE`, and automatic apology email dispatch with priority rescheduling links.
+- **Doctor Leave & Conflict Resolution**: Mark doctor leaves, identify conflicting bookings, transition affected appointments to `REQUIRES_RESCHEDULE`, and dispatch rescheduling emails.
 - **Outbound Notification Audit Log**: Complete audit trail of all transactional emails sent by the platform.
 
 ---
@@ -117,11 +134,12 @@ Healthcare/
 │   │   │   └── client.ts
 │   │   ├── components/               # Reusable UI & Modal Components
 │   │   │   ├── AIInsightsModal.tsx   # Interactive AI Triage & Telemetry Modal
-│   │   │   ├── FluidShaderCanvas.tsx # WebGL 2D Simplex Noise Shader Canvas
+│   │   │   ├── CarePulseBackground.tsx # Clinical ECG Pulse & Dynamic Precision Grid
+│   │   │   ├── FluidShaderCanvas.tsx # Background Component Wrapper
 │   │   │   ├── PrescriptionModal.tsx # Clinical Consultation & Rx Builder
-│   │   │   ├── Sidebar.tsx           # Stitch Dark-Themed Side Navigation
+│   │   │   ├── Sidebar.tsx           # Dark-Themed Side Navigation
 │   │   │   ├── SymptomModal.tsx      # Pre-Visit Questionnaire & Hold Timer
-│   │   │   └── TopAppBar.tsx         # Universal Header with Search & AI Trigger
+│   │   │   └── TopAppBar.tsx         # Universal Header with Search, Bell & AI Trigger
 │   │   ├── context/                  # Authentication Context
 │   │   │   └── AuthContext.tsx
 │   │   ├── pages/                    # Role-Specific Dashboard Pages
@@ -213,10 +231,10 @@ npm run dev
 | `PORT` | Backend HTTP Port | `5000` | No |
 | `NODE_ENV` | Environment Mode | `development` / `production` | No |
 | `DATABASE_URL` | Database Connection String | `file:./dev.db` | Yes |
-| `JWT_SECRET` | Secret Key for JWT Tokens | `super-secret-healthcare-jwt-key` | Yes |
+| `JWT_SECRET` | Secret Key for JWT Tokens | `your-secure-jwt-secret` | Yes |
 | `CLIENT_URL` | Frontend URL for CORS | `http://localhost:5173` | Yes |
-| `GEMINI_API_KEY` | Google Gemini API Key | `AQ.Ab8...` | Optional (Fallback Active) |
-| `OPENAI_API_KEY` | OpenAI API Key | `sk-...` | Optional (Fallback Active) |
+| `GEMINI_API_KEY` | Google Gemini API Key | `your-gemini-api-key` | Optional (Fallback Active) |
+| `OPENAI_API_KEY` | OpenAI API Key | `your-openai-api-key` | Optional (Fallback Active) |
 | `SMTP_HOST` | SMTP Email Server Host | `smtp.gmail.com` | Optional |
 | `SMTP_PORT` | SMTP Email Server Port | `587` | Optional |
 | `SMTP_USER` | SMTP Email Username | `your-email@gmail.com` | Optional |
@@ -236,7 +254,7 @@ npm run dev
 
 ### Doctors & Availability (`/api/doctors`)
 - `GET /api/doctors` — List all specialists with optional search & specialty filters.
-- `GET /api/doctors/:id/availability?date=YYYY-MM-DD` — Compute real-time slots and leave status.
+- `GET /api/doctors/:id/availability?date=YYYY-MM-DD` — Compute real-time slots and leave status with IST elapsed slot locking.
 
 ### Appointments (`/api/appointments`)
 - `POST /api/appointments/hold` — Acquire a 10-minute temporary reservation lock.
@@ -254,7 +272,7 @@ npm run dev
 
 ### Administration (`/api/admin`)
 - `GET /api/admin/analytics` — Platform KPIs (Doctors, Appointments, Patients, Email Deliveries).
-- `POST /api/admin/doctors/:id/leave` — Register doctor leave and trigger automated rescheduling.
+- `POST /api/admin/doctors/:id/leave` — Register doctor leave, transition conflicting bookings to `REQUIRES_RESCHEDULE`, and dispatch priority rescheduling links.
 - `GET /api/admin/doctors/:id/leaves` — List all active leave dates for a specialist.
 - `DELETE /api/admin/doctors/:id/leaves/:date` — Remove an approved doctor leave.
 - `GET /api/notifications` — View outbound email dispatch audit logs.

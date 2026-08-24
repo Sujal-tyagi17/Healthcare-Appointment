@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
 import { sendEmailNotification, getDoctorLeaveCancellationHtml, formatDoctorName } from '../services/email.service.js';
+import { deleteGoogleCalendarEvent } from '../services/calendar.service.js';
 
 const router = Router();
 
@@ -216,27 +217,39 @@ router.post('/doctors/:id/leave', async (req, res) => {
         }
       });
 
+      // Cleanup Google Calendar Event if it was synced
+      if (apt.googleCalendarEventId) {
+        try {
+          await deleteGoogleCalendarEvent(apt.googleCalendarEventId);
+        } catch (calErr) {
+          console.error(`[Admin Leave] Failed to delete Google Calendar event for apt ${apt.id}:`, calErr);
+        }
+      }
+
       const rescheduleUrl = `${clientAppUrl}/reschedule/${apt.id}?doctorId=${doctorId}`;
 
       // Dispatch urgent leave notification email
-      const doctorDisplayName = formatDoctorName(doctor.name);
-      await sendEmailNotification({
-        recipientEmail: apt.patient.email,
-        recipientName: apt.patient.name,
-        subject: `URGENT: Your appointment with ${doctorDisplayName} on ${leaveDate} needs to be rescheduled`,
-        type: 'DOCTOR_LEAVE_ALERT',
-        appointmentId: apt.id,
-        html: getDoctorLeaveCancellationHtml({
-          patientName: apt.patient.name,
-          doctorName: doctor.name,
-          date: leaveDate,
-          time: `${apt.startTime} - ${apt.endTime}`,
-          reason: reason || 'Doctor on Approved Leave',
-          rescheduleUrl
-        })
-      });
-
-      notifiedCount++;
+      try {
+        const doctorDisplayName = formatDoctorName(doctor.name);
+        await sendEmailNotification({
+          recipientEmail: apt.patient.email,
+          recipientName: apt.patient.name,
+          subject: `URGENT: Your appointment with ${doctorDisplayName} on ${leaveDate} needs to be rescheduled`,
+          type: 'DOCTOR_LEAVE_ALERT',
+          appointmentId: apt.id,
+          html: getDoctorLeaveCancellationHtml({
+            patientName: apt.patient.name,
+            doctorName: doctor.name,
+            date: leaveDate,
+            time: `${apt.startTime} - ${apt.endTime}`,
+            reason: reason || 'Doctor on Approved Leave',
+            rescheduleUrl
+          })
+        });
+        notifiedCount++;
+      } catch (emailErr) {
+        console.error(`[Admin Leave] Failed to dispatch leave alert to ${apt.patient.email}:`, emailErr);
+      }
     }
 
     return res.json({
