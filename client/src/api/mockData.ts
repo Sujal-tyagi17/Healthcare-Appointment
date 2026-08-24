@@ -393,23 +393,47 @@ export class MockDataStore {
   static submitPostVisit(appointmentId: string, data: { clinicalNotes: string; prescriptions: any[] }) {
     const appointments = this.getAppointments();
     const apt = appointments.find(a => a.id === appointmentId);
+    const postVisitSummary = {
+      clinicalNotes: data.clinicalNotes,
+      patientFriendlySummary: `Here is your plain-language care plan: ${data.clinicalNotes}. Your vital signs and clinical evaluation have been reviewed. Please follow the medication directions as outlined below.`,
+      followUpSteps: '1. Take all medications with meals as prescribed.\n2. Hydrate well and monitor symptoms daily.\n3. Return for a follow-up consultation in 7 days if symptoms persist.',
+      prescription: data.prescriptions.map((p) => ({
+        medicineName: p.medicineName || p.medicationName || 'Prescribed Medicine',
+        dosage: p.dosage || 'Standard dose',
+        frequency: p.frequency || 'Once daily',
+        durationDays: typeof p.durationDays === 'number' ? p.durationDays : parseInt(p.duration, 10) || 7,
+        instructions: p.instructions || 'Take after meals'
+      }))
+    };
+
     if (apt) {
       apt.status = 'COMPLETED';
-      apt.postVisitSummary = {
-        clinicalNotes: data.clinicalNotes,
-        patientFriendlySummary: `Consultation completed. ${data.clinicalNotes.slice(0, 120)}... Please follow the recommended prescription schedule.`,
-        followUpSteps: 'Maintain prescribed routine and return for check-up if needed.',
-        prescription: data.prescriptions.map((p) => ({
-          medicineName: p.medicineName || p.medicationName || 'Prescribed Medicine',
-          dosage: p.dosage,
-          frequency: p.frequency,
-          durationDays: typeof p.durationDays === 'number' ? p.durationDays : parseInt(p.duration, 10) || 5,
-          instructions: p.instructions
-        }))
-      };
+      apt.postVisitSummary = postVisitSummary;
       this.setStorage('appointments_list', appointments);
     }
-    return { success: true };
+
+    // Also create reminders in the medications list
+    const currentMeds = this.getMedications();
+    const newMeds: MedicationReminderItem[] = postVisitSummary.prescription.map((rx, i) => ({
+      id: `med-${Date.now()}-${i}`,
+      appointmentId,
+      medicineName: rx.medicineName,
+      dosage: rx.dosage,
+      frequency: rx.frequency,
+      reminderTimes: ['09:00', '21:00'],
+      instructions: rx.instructions,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + (rx.durationDays || 7) * 86400000).toISOString().split('T')[0],
+      isActive: true,
+      doctorName: apt?.doctor?.name || 'Dr. Rajesh Sharma',
+      specialization: apt?.doctor?.specialization || 'Cardiology'
+    }));
+    this.setStorage('medications_list', [...newMeds, ...currentMeds]);
+
+    return {
+      success: true,
+      postVisitSummary
+    };
   }
 
   static getAdminAnalytics() {

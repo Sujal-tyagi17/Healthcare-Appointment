@@ -83,7 +83,13 @@ export const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
         clinicalNotes,
         prescriptions: validPrescriptions
       });
-      setResultSummary(res.postVisitSummary);
+      const summary = res?.postVisitSummary || {
+        clinicalNotes,
+        patientFriendlySummary: `Here is your plain-language care plan: ${clinicalNotes}. Please take prescribed medications as instructed.`,
+        followUpSteps: 'Follow the prescribed medication routine and schedule a follow-up if symptoms persist.',
+        prescription: validPrescriptions
+      };
+      setResultSummary(summary);
     } catch (err: any) {
       setError(err.message || 'Failed to submit post-visit consultation.');
     } finally {
