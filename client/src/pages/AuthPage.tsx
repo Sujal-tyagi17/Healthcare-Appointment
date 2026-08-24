@@ -258,7 +258,7 @@ export const AuthPage: React.FC = () => {
       {/* Right Split Screen: Authentication & Quick Test Station */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-10 relative z-10">
         <div className="w-full max-w-md">
-          <div className="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-outline-variant">
+          <div className="glass-panel login-card rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-outline-variant">
             {/* AI Accent Glow Top Line */}
             <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-80 blur-[1px]"></div>
 
