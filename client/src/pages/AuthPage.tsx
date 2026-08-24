@@ -55,11 +55,8 @@ export const AuthPage: React.FC = () => {
             <span className="material-symbols-outlined text-2xl font-bold">vital_signs</span>
           </div>
           <div>
-            <h1 className="font-heading font-extrabold text-2xl text-white tracking-tight flex items-center gap-2">
+            <h1 className="font-heading font-extrabold text-2xl text-white tracking-tight">
               CarePulse
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
-                Clinical OS
-              </span>
             </h1>
             <p className="text-xs text-on-surface-variant font-medium">Next-Generation Healthcare Intelligence &amp; Scheduling</p>
           </div>
@@ -101,7 +98,7 @@ export const AuthPage: React.FC = () => {
                 onClick={() => setActiveFeatureTab('slots')}
                 className={`text-xs font-heading font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                   activeFeatureTab === 'slots'
-                    ? 'bg-primary/20 text-primary border border-primary/40 shadow-sm'
+                    ? 'bg-primary/20 text-primary border-primary/40 shadow-sm'
                     : 'text-on-surface-variant hover:text-white hover:bg-surface-container/40'
                 }`}
               >
@@ -138,10 +135,6 @@ export const AuthPage: React.FC = () => {
                   <p className="text-xs text-on-surface-variant bg-surface-container/70 p-3 rounded-xl border border-white/5 italic">
                     "Patient reports recurring rash with mild inflammation since 3 days."
                   </p>
-                  <div className="flex items-center justify-between text-[11px] text-white pt-1">
-                    <span className="text-secondary font-semibold">Specialty: Dermatology</span>
-                    <span className="text-tertiary font-semibold">3 Diagnostic Questions Prepared</span>
-                  </div>
                 </div>
               )}
 
