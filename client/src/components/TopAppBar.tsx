@@ -171,106 +171,108 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
       </div>
 
       {/* Trailing Icon Actions & User Profile */}
-      <div className="flex items-center gap-2 relative" ref={dropdownRef}>
-        {/* Notification Bell Button */}
-        <button
-          onClick={() => setShowNotifications(!showNotifications)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all relative ${
-            showNotifications
-              ? 'bg-primary/20 text-primary ring-2 ring-primary/40'
-              : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
-          }`}
-          title="Notifications"
-          aria-expanded={showNotifications}
-        >
-          <span className="material-symbols-outlined text-lg">notifications</span>
-          {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-surface animate-pulse" />
-          )}
-        </button>
+      <div className="flex items-center gap-2">
+        {/* Notification Bell with Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all relative ${
+              showNotifications
+                ? 'bg-primary/20 text-primary ring-2 ring-primary/40'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+            }`}
+            title="Notifications"
+            aria-expanded={showNotifications}
+          >
+            <span className="material-symbols-outlined text-lg">notifications</span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-surface animate-pulse" />
+            )}
+          </button>
 
-        {/* Notifications Dropdown Panel */}
-        {showNotifications && (
-          <div className="absolute right-0 top-13 w-80 sm:w-96 bg-[#0b1328] border border-cyan-500/25 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden z-50 animate-fade-in backdrop-blur-3xl ring-1 ring-white/10">
-            {/* Dropdown Header */}
-            <div className="p-3.5 border-b border-white/10 flex items-center justify-between bg-[#0f1b38]">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
-                  <span className="material-symbols-outlined text-sm">notifications_active</span>
+          {/* Notifications Dropdown Panel */}
+          {showNotifications && (
+            <div className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-[#0b1328] border border-cyan-500/25 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden z-50 animate-fade-in backdrop-blur-3xl ring-1 ring-white/10">
+              {/* Dropdown Header */}
+              <div className="p-3.5 border-b border-white/10 flex items-center justify-between bg-[#0f1b38]">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
+                    <span className="material-symbols-outlined text-sm">notifications_active</span>
+                  </div>
+                  <span className="font-heading font-extrabold text-xs text-white">Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-primary/25 text-primary text-[10px] font-extrabold font-mono border border-primary/40">
+                      {unreadCount} new
+                    </span>
+                  )}
                 </div>
-                <span className="font-heading font-extrabold text-xs text-white">Notifications</span>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-primary/25 text-primary text-[10px] font-extrabold font-mono border border-primary/40">
-                    {unreadCount} new
-                  </span>
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-[11px] text-primary hover:text-cyan-300 font-heading font-bold transition-colors"
+                  >
+                    Mark all as read
+                  </button>
                 )}
               </div>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-[11px] text-primary hover:text-cyan-300 font-heading font-bold transition-colors"
-                >
-                  Mark all as read
-                </button>
-              )}
-            </div>
 
-            {/* Notification List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-white/5 bg-[#0b1328]">
-              {notifications.length === 0 ? (
-                <div className="py-10 text-center text-on-surface-variant space-y-2">
-                  <span className="material-symbols-outlined text-3xl text-on-surface-variant/40">notifications_off</span>
-                  <p className="text-xs font-medium">All caught up! No notifications.</p>
-                </div>
-              ) : (
-                notifications.map(item => (
-                  <div
-                    key={item.id}
-                    className={`p-3.5 transition-colors flex items-start gap-3 relative group ${
-                      item.read
-                        ? 'bg-[#0b1328] hover:bg-[#111e3b]'
-                        : 'bg-[#101d3a] hover:bg-[#15254a] border-l-2 border-primary'
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-[#142347] flex items-center justify-center shrink-0 border border-white/10 shadow-sm">
-                      {getIcon(item.type)}
-                    </div>
-                    <div className="flex-1 min-w-0 pr-4">
-                      <div className="flex items-center justify-between gap-1">
-                        <p className={`text-xs font-heading font-bold truncate ${item.read ? 'text-slate-200' : 'text-white'}`}>
-                          {item.title}
-                        </p>
-                        <span className="text-[10px] text-cyan-400/80 font-mono shrink-0 font-medium">
-                          {item.time}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">
-                        {item.message}
-                      </p>
-                    </div>
-
-                    {/* Delete action button on hover */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeNotification(item.id);
-                      }}
-                      className="absolute right-2 top-2 p-1 text-slate-500 hover:text-red-400 rounded transition-opacity opacity-0 group-hover:opacity-100"
-                      title="Dismiss notification"
-                    >
-                      <span className="material-symbols-outlined text-sm">close</span>
-                    </button>
+              {/* Notification List */}
+              <div className="max-h-80 overflow-y-auto divide-y divide-white/5 bg-[#0b1328]">
+                {notifications.length === 0 ? (
+                  <div className="py-10 text-center text-on-surface-variant space-y-2">
+                    <span className="material-symbols-outlined text-3xl text-on-surface-variant/40">notifications_off</span>
+                    <p className="text-xs font-medium">All caught up! No notifications.</p>
                   </div>
-                ))
-              )}
-            </div>
+                ) : (
+                  notifications.map(item => (
+                    <div
+                      key={item.id}
+                      className={`p-3.5 transition-colors flex items-start gap-3 relative group ${
+                        item.read
+                          ? 'bg-[#0b1328] hover:bg-[#111e3b]'
+                          : 'bg-[#101d3a] hover:bg-[#15254a] border-l-2 border-primary'
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-[#142347] flex items-center justify-center shrink-0 border border-white/10 shadow-sm">
+                        {getIcon(item.type)}
+                      </div>
+                      <div className="flex-1 min-w-0 pr-4">
+                        <div className="flex items-center justify-between gap-1">
+                          <p className={`text-xs font-heading font-bold truncate ${item.read ? 'text-slate-200' : 'text-white'}`}>
+                            {item.title}
+                          </p>
+                          <span className="text-[10px] text-cyan-400/80 font-mono shrink-0 font-medium">
+                            {item.time}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">
+                          {item.message}
+                        </p>
+                      </div>
 
-            {/* Footer */}
-            <div className="p-2.5 border-t border-white/10 bg-[#080e1c] text-center">
-              <span className="text-[10px] font-medium text-slate-400">CarePulse Real-Time Clinical Notifications</span>
+                      {/* Delete action button on hover */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeNotification(item.id);
+                        }}
+                        className="absolute right-2 top-2 p-1 text-slate-500 hover:text-red-400 rounded transition-opacity opacity-0 group-hover:opacity-100"
+                        title="Dismiss notification"
+                      >
+                        <span className="material-symbols-outlined text-sm">close</span>
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-2.5 border-t border-white/10 bg-[#080e1c] text-center">
+                <span className="text-[10px] font-medium text-slate-400">CarePulse Real-Time Clinical Notifications</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* AI Assistant Button */}
         <button
