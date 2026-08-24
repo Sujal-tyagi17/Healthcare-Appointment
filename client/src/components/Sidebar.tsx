@@ -22,9 +22,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <nav className="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface-dim/95 backdrop-blur-xl border-r border-outline-variant/30 w-64 shadow-sm hidden md:flex">
+    <nav className="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface/95 backdrop-blur-xl border-r border-outline-variant w-64 shadow-sm hidden md:flex transition-colors duration-300">
       {/* Header */}
-      <div className="px-6 py-6 flex flex-col gap-1 border-b border-outline-variant/20">
+      <div className="px-6 py-6 flex flex-col gap-1 border-b border-outline-variant">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white shadow-neon-cyan shrink-0">
             <span className="material-symbols-outlined text-2xl font-bold">vital_signs</span>
@@ -46,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onTabChange && onTabChange(item.label)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl font-heading text-xs font-bold transition-all duration-200 text-left ${
                 isActive
-                  ? 'bg-secondary-container/20 border-l-4 border-primary text-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 border-l-4 border-transparent'
+                  ? 'bg-primary/15 border-l-4 border-primary text-primary shadow-sm'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border-l-4 border-transparent'
               }`}
             >
               <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
@@ -60,10 +60,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Role & Footer CTA */}
-      <div className="p-4 border-t border-outline-variant/20 space-y-3">
+      <div className="p-4 border-t border-outline-variant space-y-3">
         <button
           onClick={onOpenAIInsights}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container hover:bg-surface-container-high transition-all duration-200 rounded-xl border border-outline-variant/40 group ai-gradient-border"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container hover:bg-surface-container-high transition-all duration-200 rounded-xl border border-outline-variant group ai-gradient-border"
         >
           <span className="material-symbols-outlined text-secondary text-base group-hover:scale-110 transition-transform">
             auto_awesome
@@ -71,10 +71,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="font-heading text-xs font-bold gradient-text-ai">AI Insights</span>
         </button>
 
-        <div className="bg-surface-container-low p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+        <div className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant flex items-center justify-between">
           <div className="truncate pr-2">
             <span className="text-[10px] font-bold text-primary block uppercase tracking-wider">{user?.role}</span>
-            <span className="text-xs text-white font-heading font-semibold truncate block">{user?.name}</span>
+            <span className="text-xs text-on-surface font-heading font-semibold truncate block">{user?.name}</span>
           </div>
           <button
             onClick={logout}
