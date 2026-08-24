@@ -28,10 +28,11 @@ export const DoctorDashboard: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await api.getAppointments(selectedStatus);
-      setAppointments(res.appointments);
-      if (res.appointments.length > 0) {
-        if (!selectedAppointment || !res.appointments.find(a => a.id === selectedAppointment.id)) {
-          setSelectedAppointment(res.appointments[0]);
+      const list = res?.appointments || [];
+      setAppointments(list);
+      if (list.length > 0) {
+        if (!selectedAppointment || !list.find(a => a.id === selectedAppointment.id)) {
+          setSelectedAppointment(list[0]);
         }
       }
     } catch (err) {

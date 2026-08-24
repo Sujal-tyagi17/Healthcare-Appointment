@@ -86,10 +86,12 @@ export const PatientDashboard: React.FC = () => {
           api.getDoctors(),
           api.getSpecializations()
         ]);
-        setDoctors(docRes.doctors);
-        setSpecializations(specRes.specializations);
-        if (docRes.doctors.length > 0) {
-          setSelectedDoctor(docRes.doctors[0]);
+        const docs = docRes?.doctors || [];
+        const specs = specRes?.specializations || [];
+        setDoctors(docs);
+        setSpecializations(specs);
+        if (docs.length > 0) {
+          setSelectedDoctor(docs[0]);
         }
       } catch (err) {
         console.error('Failed to load doctors:', err);
@@ -103,9 +105,10 @@ export const PatientDashboard: React.FC = () => {
     async function filterDocs() {
       try {
         const res = await api.getDoctors(searchQuery || undefined, selectedSpec);
-        setDoctors(res.doctors);
-        if (res.doctors.length > 0 && (!selectedDoctor || !res.doctors.find(d => d.id === selectedDoctor.id))) {
-          setSelectedDoctor(res.doctors[0]);
+        const docs = res?.doctors || [];
+        setDoctors(docs);
+        if (docs.length > 0 && (!selectedDoctor || !docs.find(d => d.id === selectedDoctor.id))) {
+          setSelectedDoctor(docs[0]);
         }
       } catch (err) {
         console.error('Failed to filter doctors:', err);
@@ -124,7 +127,7 @@ export const PatientDashboard: React.FC = () => {
       try {
         const res = await api.getDoctorAvailability(selectedDoctor!.id, selectedDate);
         setAvailability(res);
-        if (!res.isOnLeave && res.slots && res.slots.length > 0) {
+        if (res && !res.isOnLeave && res.slots && res.slots.length > 0) {
           const firstAvail = res.slots.find(s => s.isAvailable);
           if (firstAvail) {
             setSelectedSlot(firstAvail);
@@ -147,8 +150,8 @@ export const PatientDashboard: React.FC = () => {
         api.getAppointments(),
         api.getMedicationReminders()
       ]);
-      setAppointments(aptRes.appointments);
-      setMedications(medRes.medications);
+      setAppointments(aptRes?.appointments || []);
+      setMedications(medRes?.medications || []);
     } catch (err) {
       console.error('Failed to load user data:', err);
     } finally {

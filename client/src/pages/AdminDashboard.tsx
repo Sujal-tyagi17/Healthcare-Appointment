@@ -62,13 +62,14 @@ export const AdminDashboard: React.FC = () => {
         api.getDoctors(),
         api.getNotificationLogs()
       ]);
-      setStats(analyticsRes.stats);
-      setRecentApts(analyticsRes.recentAppointments || []);
-      setDoctors(docRes.doctors);
-      setNotificationLogs(notifRes.logs || []);
+      setStats(analyticsRes?.stats || null);
+      setRecentApts(analyticsRes?.recentAppointments || []);
+      const docs = docRes?.doctors || [];
+      setDoctors(docs);
+      setNotificationLogs(notifRes?.logs || []);
 
-      if (docRes.doctors.length > 0 && !selectedDoctorId) {
-        setSelectedDoctorId(docRes.doctors[0].id);
+      if (docs.length > 0 && !selectedDoctorId) {
+        setSelectedDoctorId(docs[0].id);
       }
     } catch (err) {
       console.error('Failed to load admin data:', err);
