@@ -107,18 +107,30 @@ npm run dev
 
 ---
 
-## 🔑 Pre-Seeded Demo Credentials
+## 🔑 Pre-Seeded Testing & Demo Credentials
 
-The app includes an **Interactive Demo Bar** at the top for 1-click role switching, or you can log in manually:
+All test accounts are automatically pre-seeded in the database and ready for immediate login:
 
-| Role | Name | Email | Password |
+### 👑 Clinic Administration
+| Role | Name | Email | Password | Access Level |
+|---|---|---|---|---|
+| **Admin** | Clinic Administrator | `admin@carepulse.com` | `admin123` | Full clinic management, leave scheduling & analytics |
+
+### 🩺 Specialists & Doctor Clinical Station
+| Specialist | Field | Email | Password | Fee | Room / Wing |
+|---|---|---|---|---|---|
+| **Dr. Rajesh Sharma** | **Cardiology** | `dr.rajesh@carepulse.com` | `doctor123` | ₹1,200 | Suite 201 (Cardiology Wing) |
+| **Dr. Ananya Iyer** | **Dermatology** | `dr.ananya@carepulse.com` | `doctor123` | ₹800 | Suite 105 (Skin & Cosmetology) |
+| **Dr. Vikram Malhotra** | **Neurology** | `dr.vikram@carepulse.com` | `doctor123` | ₹1,500 | Suite 310 (Neurosciences) |
+| **Dr. Amit Verma** | **General Medicine** | `dr.amit@carepulse.com` | `doctor123` | ₹500 | Room 102 (OPD Practice) |
+| **Dr. Priya Patel** | **Pediatrics** | `dr.priya@carepulse.com` | `doctor123` | ₹700 | Suite 108 (Child Health Wing) |
+
+### 👤 Patient Accounts
+| Patient Name | Email | Password | Pre-Seeded History |
 |---|---|---|---|
-| **Patient** | John Doe | `john@example.com` | `password123` |
-| **Patient** | Alice Smith | `alice@example.com` | `password123` |
-| **Doctor** (Cardiology) | Dr. Sarah Jenkins | `dr.sarah@carepulse.com` | `doctor123` |
-| **Doctor** (Dermatology) | Dr. Marcus Chen | `dr.marcus@carepulse.com` | `doctor123` |
-| **Doctor** (Neurology) | Dr. Emily Rodriguez | `dr.emily@carepulse.com` | `doctor123` |
-| **Admin** | Clinic Administrator | `admin@carepulse.com` | `admin123` |
+| **Rahul Sharma** | `rahul@example.com` | `password123` | 1 Completed Cardiology Visit + Active Beta-Blocker Medication Alerts |
+| **Pooja Verma** | `pooja@example.com` | `password123` | 1 Active Dermatology Consultation in Queue with AI Triage |
+| **John Doe** | `john@example.com` | `password123` | Clean Account ready for new test bookings |
 
 ---
 
