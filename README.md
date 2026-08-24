@@ -1,120 +1,93 @@
-# CarePulse — Healthcare Appointment & Follow-Up Manager
+# 🏥 CarePulse — AI-Powered Healthcare Appointment & Clinical Intelligence Platform
 
-A full-stack, enterprise-ready healthcare appointment platform featuring dedicated portals for **Patients**, **Doctors**, and **Clinic Administrators**. Powered by AI for pre-visit symptom triage, post-visit clinical translations, conflict-free scheduling, automated medication reminders, and dual calendar synchronization.
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 
----
-
-## 🌟 Key Features
-
-### 1. Patient Portal
-- **Specialist Discovery**: Search doctors by name or filter dynamically by medical specialty (Cardiology, Dermatology, Neurology, General Medicine, Pediatrics).
-- **Conflict-Free Booking & Slot Hold**: Select available slots with a 10-minute temporary lock (`TTL`) ensuring no double-bookings occur while typing symptoms.
-- **AI Pre-Visit Symptom Questionnaire**: Submit symptoms and receive an immediate AI clinical triage assessment with urgency levels (`LOW`, `MEDIUM`, `HIGH`) and doctor inquiry previews.
-- **Dual Calendar Sync**: 1-click **Add to Google Calendar** direct link and universal **`.ICS` file download** for Apple Calendar and Outlook.
-- **Medical History & Post-Visit Summaries**: Review doctor clinical diagnoses translated into patient-friendly explanations.
-- **Medication Reminders**: View daily dosage times, meal instructions, and toggle alerts.
-
-### 2. Doctor Clinical Station
-- **Today's Queue & Daily Agenda**: Real-time view of booked and in-progress patient visits.
-- **AI Clinical Pre-Visit Summary**:
-  - Triage Urgency Badge (`LOW`, `MEDIUM`, `HIGH`).
-  - Chief complaint extraction.
-  - 3 AI-suggested diagnostic questions tailored to the reported symptoms.
-- **Consultation & Prescription Builder**: Enter clinical findings and add multi-drug prescriptions with customizable frequencies (Once daily, Twice daily, Every 8 hours, etc.).
-- **1-Click AI Translation**: Automatically translates clinical notes into patient-friendly instructions and generates scheduled medication reminder jobs.
-
-### 3. Clinic Administrator Portal
-- **Doctor Profile Management**: Create and configure doctor specialties, consultation fees, room assignments, slot duration (10–120 mins), and working hours.
-- **Doctor Leave & Automated Conflict Resolution**: Mark a doctor on leave for any date. The system automatically:
-  1. Identifies all conflicting bookings on that date.
-  2. Updates their status to `REQUIRES_RESCHEDULE`.
-  3. Dispatches urgent apology emails to all affected patients with direct priority reschedule links.
-- **Platform Analytics**: Live stats on active specialists, booked visits, patient growth, and email delivery rates.
-- **Notification Logs & Retry Queue**: Audit trail for all emails with delivery status and automated retry capability.
+An enterprise-grade healthcare appointment management system engineered with modern dark-mode clinical glassmorphism, animated WebGL GLSL fluid noise shaders, real-time AI symptom triage, post-visit clinical translations, dual calendar synchronization, and automated cron-driven medication reminder dispatchers.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
-
-```
-Healthcare-Platform/
-├── client/                     # Frontend (React 18, Vite, Tailwind CSS, Lucide Icons)
-│   ├── src/
-│   │   ├── api/                # API client with auth & error handling
-│   │   ├── components/         # Navbar, DemoBanner, SymptomModal, PrescriptionModal
-│   │   ├── context/            # AuthContext with 1-click demo switcher
-│   │   ├── pages/              # PatientDashboard, DoctorDashboard, AdminDashboard, AuthPage
-│   │   └── types/              # Unified TypeScript definitions
-│   └── tailwind.config.js
-├── server/                     # Backend API & Background Jobs (Node.js, Express, TypeScript)
-│   ├── prisma/                 # Prisma ORM Schema & SQLite / PostgreSQL driver
-│   ├── src/
-│   │   ├── middleware/         # JWT Auth and Role-Based Access Control (RBAC)
-│   │   ├── routes/             # Auth, Doctor, Appointment, Consultation, Admin, Notification
-│   │   ├── services/           # LLM Service (Gemini/OpenAI + Fallback), Email, Calendar, Cron Schedulers
-│   │   ├── seed.ts             # Pre-seeded demo database
-│   │   └── index.ts            # Server entry point
-│   └── test/                   # Concurrency and double-booking automated tests
-├── SYSTEM_DESIGN.md            # System design write-up (Concurrency, Holds, Leaves, Notifications)
-├── .env.example                # Documented configuration template
-└── package.json                # Root orchestration scripts
-```
-
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM, SQLite (zero-config, portable).
-- **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, Glassmorphism design tokens.
-- **AI / LLM Service**: Google Gemini & OpenAI API integration with an **Intelligent Clinical Rule-Based Fallback Engine** that guarantees zero crashes if API keys are unset or rate-limited.
-- **Calendar**: Google Calendar API OAuth2 + Direct Web Render Links + RFC-5545 iCalendar (`.ics`).
-- **Email Service**: Nodemailer with HTML templates, Ethereal test mailer support, and exponential backoff retry worker.
+## 📑 Table of Contents
+1. [Tech Stack Breakdown](#-tech-stack-breakdown)
+2. [Core System Capabilities](#-core-system-capabilities)
+3. [Key Architectural Highlights](#-key-architectural-highlights)
+4. [Pre-Seeded Testing Credentials](#-pre-seeded-testing-credentials)
+5. [Directory Structure](#-directory-structure)
+6. [Getting Started & Local Setup](#-getting-started--local-setup)
+7. [Environment Variables](#-environment-variables)
+8. [API Endpoint Reference](#-api-endpoint-reference)
+9. [Production Deployment Guide](#-production-deployment-guide)
 
 ---
 
-## 🚀 Quick Start Guide
+## 🛠️ Tech Stack Breakdown
 
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm (v9 or higher)
+### Frontend
+- **Framework**: React 18 with Vite build tool.
+- **Language**: TypeScript (Strict Mode).
+- **Styling**: Tailwind CSS with custom glassmorphism design tokens (`backdrop-blur`, neon cyan/violet glow utilities).
+- **Interactive Shader**: Custom WebGL canvas with 2D Simplex Noise fragment shader (`FluidShaderCanvas.tsx`).
+- **Iconography**: Google Material Symbols Outlined & Lucide React.
+- **State Management**: React Context API (`AuthContext`) with persistent JWT local authentication.
 
-### 1. Install Dependencies
-Run from the root directory:
-```bash
-npm run install:all
-```
-*(Or navigate into `server` and `client` and run `npm install` in each).*
+### Backend & Database
+- **Runtime**: Node.js (v18+) with Express.js REST API.
+- **Language**: TypeScript (compiled with `tsc`).
+- **ORM & Database**: Prisma ORM with SQLite (portable zero-config) and native PostgreSQL support.
+- **Security & Validation**: JSON Web Tokens (`jsonwebtoken`), `bcryptjs` password hashing, and `Zod` request body validation.
 
-### 2. Setup Environment Variables
-Copy `.env.example` to `server/.env`:
-```bash
-# In Windows PowerShell:
-copy .env.example server\.env
+### Artificial Intelligence & Clinical Intelligence
+- **Primary Engines**: Google Gemini API (`@google/genai`) & OpenAI API (`gpt-4o-mini`).
+- **Intelligent Heuristic Fallback Engine**: Built-in deterministic clinical rule system that parses keyword urgency, formulates diagnostic inquiries, and simplifies medical prescriptions with 100% uptime even during rate limits or network outages.
 
-# In Linux/macOS:
-cp .env.example server/.env
-```
-*(The defaults in `.env.example` work immediately with SQLite and local mailers without requiring any external cloud setup!)*
-
-### 3. Initialize & Seed Database
-```bash
-npm run seed
-```
-*(This generates the Prisma client, pushes the SQLite schema, and creates demo doctors, patients, appointments, and admin accounts).*
-
-### 4. Run Locally in Development Mode
-```bash
-npm run dev
-```
-- **Frontend UI**: [http://localhost:5173](http://localhost:5173)
-- **Backend API**: [http://localhost:5000/api](http://localhost:5000/api)
+### Background Automation & Communications
+- **Cron Jobs**: `node-cron` scheduled workers:
+  - Expired slot hold eviction (runs every 60 seconds).
+  - Medication reminder alerts (runs every 60 seconds).
+  - Conflict resolution worker for doctor leaves.
+- **Email Dispatcher**: Nodemailer with rich HTML responsive clinical templates and exponential backoff retry logging.
+- **Calendar Integration**: Google Calendar API (OAuth2) + native RFC-5545 iCalendar (`.ics`) file generation.
 
 ---
 
-## 🔑 Pre-Seeded Testing & Demo Credentials
+## 🌟 Core System Capabilities
 
-All test accounts are automatically pre-seeded in the database and ready for immediate login:
+### 1. 👤 Patient Portal
+- **Specialist Matrix**: Discover Indian specialists across Cardiology, Dermatology, Neurology, General Medicine, and Pediatrics with consultation fees in INR (`₹`).
+- **Instant Slot Booking**: 1-click slot selection with real-time 10-minute temporary lock hold (`slotHold` TTL) to prevent double booking.
+- **AI Symptom Triage**: Pre-visit questionnaire assessing urgency (`LOW`, `MEDIUM`, `HIGH`) and suggesting diagnostic questions for the physician.
+- **Active Consultation Schedule**: Real-time view of upcoming visits with 1-click `.ICS` calendar downloads.
+- **Medication Reminders**: Daily prescription schedules with meal instructions and toggleable automated alerts.
+- **AI Clinical Insights Hub**: Interactive live symptom checker and platform telemetry modal.
+
+### 2. 🩺 Doctor Clinical Station
+- **Live Patient Queue**: Sorted chronological view of daily appointments with patient status pills.
+- **AI Pre-Visit Brief**: Patient chief complaint summaries, urgency triage badges, and AI-formulated diagnostic inquiries.
+- **Post-Visit Consultation Builder**: Multi-drug prescription builder with dosage, frequencies (e.g. *Twice daily*, *Once daily*), and meal instructions.
+- **AI Care Plan Translation**: 1-click translation of complex medical jargon into clear, patient-friendly instructions with automatic reminder alarm creation.
+
+### 3. 👑 Clinic Administration Portal
+- **4 Real-Time KPI Cards**: Active doctors, total scheduled visits, patient registrations, and email delivery success rate.
+- **Specialist Roster Manager**: Configure doctor consultation fees, room assignments, slot durations (10–120 min), and working hours.
+- **Doctor Leave & Conflict Resolution**: Mark doctor leaves with automated cancellation of conflicting bookings, status update to `REQUIRES_RESCHEDULE`, and automatic apology email dispatch with priority rescheduling links.
+- **Outbound Notification Audit Log**: Complete audit trail of all transactional emails sent by the platform.
+
+---
+
+## 🔑 Pre-Seeded Testing Credentials
+
+All credentials below are pre-seeded in the database and ready for immediate testing:
 
 ### 👑 Clinic Administration
 | Role | Name | Email | Password | Access Level |
 |---|---|---|---|---|
-| **Admin** | Clinic Administrator | `admin@carepulse.com` | `admin123` | Full clinic management, leave scheduling & analytics |
+| **Admin** | Clinic Administrator | `admin@carepulse.com` | `admin123` | Full clinic management & analytics |
 
 ### 🩺 Specialists & Doctor Clinical Station
 | Specialist | Field | Email | Password | Fee | Room / Wing |
@@ -134,92 +107,188 @@ All test accounts are automatically pre-seeded in the database and ready for imm
 
 ---
 
-## 🧪 Automated Concurrency & Double-Booking Test
+## 📁 Directory Structure
 
-To verify that simultaneous requests cannot book the same slot:
+```
+Healthcare/
+├── client/                           # React + Vite Frontend
+│   ├── src/
+│   │   ├── api/                      # Typed REST API Client
+│   │   │   └── client.ts
+│   │   ├── components/               # Reusable UI & Modal Components
+│   │   │   ├── AIInsightsModal.tsx   # Interactive AI Triage & Telemetry Modal
+│   │   │   ├── FluidShaderCanvas.tsx # WebGL 2D Simplex Noise Shader Canvas
+│   │   │   ├── PrescriptionModal.tsx # Clinical Consultation & Rx Builder
+│   │   │   ├── Sidebar.tsx           # Stitch Dark-Themed Side Navigation
+│   │   │   ├── SymptomModal.tsx      # Pre-Visit Questionnaire & Hold Timer
+│   │   │   └── TopAppBar.tsx         # Universal Header with Search & AI Trigger
+│   │   ├── context/                  # Authentication Context
+│   │   │   └── AuthContext.tsx
+│   │   ├── pages/                    # Role-Specific Dashboard Pages
+│   │   │   ├── AdminDashboard.tsx    # Admin Roster & Leave Manager
+│   │   │   ├── AuthPage.tsx          # Split-Screen Login & Registration
+│   │   │   ├── DoctorDashboard.tsx   # Doctor Clinical Station & Pre-Visit Brief
+│   │   │   └── PatientDashboard.tsx  # Patient Specialist Matrix & Slot Picker
+│   │   ├── types/                    # Shared TypeScript Interfaces
+│   │   ├── App.tsx                   # Main Router & Authentication Gate
+│   │   ├── index.css                 # Design Tokens & Utility Classes
+│   │   └── main.tsx
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.ts
+├── server/                           # Express.js REST API Backend
+│   ├── prisma/
+│   │   └── schema.prisma             # Database Schema (Users, Appointments, Leaves, etc.)
+│   ├── src/
+│   │   ├── middleware/
+│   │   │   └── auth.middleware.ts    # JWT Authentication & RBAC Guard
+│   │   ├── routes/                   # Modular REST API Routes
+│   │   │   ├── admin.routes.ts       # Analytics & Leave Management
+│   │   │   ├── appointment.routes.ts # Slot Holds, Bookings, Calendar & Triage
+│   │   │   ├── auth.routes.ts        # Register, Login & Profile Retrieval
+│   │   │   ├── consultation.routes.ts# Post-Visit Care Plans & Med Reminders
+│   │   │   ├── doctor.routes.ts      # Doctor List & Live Availability Engine
+│   │   │   └── notification.routes.ts# Email Dispatch Logs & Audit Trail
+│   │   ├── services/                 # Background & External Integration Services
+│   │   │   ├── calendar.service.ts   # Google Calendar & .ICS Generator
+│   │   │   ├── email.service.ts      # Nodemailer HTML Templates & Delivery
+│   │   │   ├── llm.service.ts        # Gemini/OpenAI API + Resilient Rule Fallback
+│   │   │   └── scheduler.service.ts  # Node-Cron Hold Eviction & Medication Alarms
+│   │   ├── db.ts                     # Prisma Client Singleton
+│   │   ├── index.ts                  # Server Entry Point & Route Mounting
+│   │   ├── seed.ts                   # Pre-Seeded Database Initializer
+│   │   └── types.ts
+│   ├── package.json
+│   └── tsconfig.json
+├── SYSTEM_DESIGN.md                  # Comprehensive Architectural Design Doc
+├── .env.example                      # Documented Configuration Template
+├── package.json                      # Root Workspace Scripts
+└── README.md                         # Project Documentation
+```
+
+---
+
+## 🚀 Getting Started & Local Setup
+
+### 1. Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+
+### 2. Installation
+Clone the repository and install all dependencies:
 ```bash
-npm run test
+git clone https://github.com/Sujal-tyagi17/Healthcare-Appointment.git
+cd Healthcare-Appointment
+npm run install:all
 ```
-This test spawns parallel transactional queries attempting to book the exact same slot and asserts that only one succeeds with `201 Created` while the other is rejected with `409 Conflict`.
+
+### 3. Configure Environment Variables
+Copy `.env.example` to `server/.env`:
+```bash
+# Windows PowerShell:
+copy .env.example server\.env
+
+# Linux / macOS:
+cp .env.example server/.env
+```
+
+### 4. Initialize & Seed Database
+```bash
+npm run seed
+```
+
+### 5. Launch Development Server
+```bash
+npm run dev
+```
+- **Patient & Doctor Web UI**: [http://localhost:5173](http://localhost:5173)
+- **Backend REST API**: [http://localhost:5000/api](http://localhost:5000/api)
 
 ---
 
-## 🤖 LLM Prompt Engineering & Resilience
+## ⚙️ Environment Variables
 
-### 1. Pre-Visit Triage Prompt
-```text
-You are an expert clinical triage assistant.
-Analyse these symptoms and return a JSON object with:
-- urgencyLevel: exactly one of "Low", "Medium", or "High"
-- chiefComplaint: a clear, concise 1-sentence summary of the main health concern
-- suggestedQuestions: an array of exactly 3 relevant diagnostic questions the doctor should ask the patient
-
-Symptoms: <symptoms>
-```
-
-### 2. Post-Visit Clinical Translation Prompt
-```text
-You are a compassionate healthcare communication specialist.
-Convert these clinical notes and prescription details into a patient-friendly summary with clear medication schedules and follow-up steps.
-
-Clinical Notes: <clinicalNotes>
-Prescriptions: <prescriptionsJson>
-```
-
-### 3. Resilient Fallback Strategy
-If OpenAI or Gemini API keys are omitted or third-party APIs encounter 429/500 errors, the backend seamlessly switches to an internal heuristic triage engine analyzing keyword severity, generating structured diagnostic questions, and translating prescriptions without failing the user request.
-
----
-
-## 📅 Google Calendar API Setup
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a project and enable the **Google Calendar API**.
-3. Under **Credentials**, create an **OAuth 2.0 Client ID** (Web application).
-4. Add authorized redirect URIs and obtain your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
-5. Obtain a `GOOGLE_REFRESH_TOKEN` via OAuth playground or consent flow.
-6. Populate the values in `server/.env`:
-   ```env
-   GOOGLE_CLIENT_ID="your-client-id"
-   GOOGLE_CLIENT_SECRET="your-client-secret"
-   GOOGLE_REFRESH_TOKEN="your-refresh-token"
-   ```
-*Note: If OAuth variables are not provided, the platform automatically generates deep web links and `.ics` files that open natively in Google Calendar on any device.*
-
----
-
-## 📡 API Reference Overview
-
-| Method | Endpoint | Description | Role |
+| Variable | Description | Default / Example | Required |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Register new user account | Public |
-| `POST` | `/api/auth/login` | Login and obtain JWT token | Public |
-| `GET` | `/api/auth/me` | Get current user profile | Authenticated |
-| `GET` | `/api/doctors` | List doctors with specialty filter | Public |
-| `GET` | `/api/doctors/:id/availability?date=YYYY-MM-DD` | Get slots and leave status | Public |
-| `POST` | `/api/appointments/hold` | Hold slot with 10-min TTL | Patient |
-| `DELETE`| `/api/appointments/hold/:token` | Release temporary slot hold | Patient |
-| `POST` | `/api/appointments/book` | Book slot with AI triage & email | Patient |
-| `GET` | `/api/appointments` | Get user/doctor appointments | Authenticated |
-| `DELETE`| `/api/appointments/:id` | Cancel an appointment | Authenticated |
-| `GET` | `/api/appointments/:id/ics` | Download .ICS calendar file | Authenticated |
-| `POST` | `/api/consultations/:id/post-visit` | Save notes & AI care plan | Doctor / Admin |
-| `GET` | `/api/consultations/medications` | Get medication reminders | Patient |
-| `PATCH`| `/api/consultations/medications/:id/toggle` | Toggle medication reminder | Patient |
-| `POST` | `/api/admin/doctors/:id/leave` | Register leave & resolve conflicts | Admin |
-| `GET` | `/api/admin/analytics` | View system performance metrics | Admin |
-| `GET` | `/api/notifications` | View outbound notification logs | Admin |
+| `PORT` | Backend HTTP Port | `5000` | No |
+| `NODE_ENV` | Environment Mode | `development` / `production` | No |
+| `DATABASE_URL` | Database Connection String | `file:./dev.db` | Yes |
+| `JWT_SECRET` | Secret Key for JWT Tokens | `super-secret-healthcare-jwt-key` | Yes |
+| `CLIENT_URL` | Frontend URL for CORS | `http://localhost:5173` | Yes |
+| `GEMINI_API_KEY` | Google Gemini API Key | `AQ.Ab8...` | Optional (Fallback Active) |
+| `OPENAI_API_KEY` | OpenAI API Key | `sk-...` | Optional (Fallback Active) |
+| `SMTP_HOST` | SMTP Email Server Host | `smtp.gmail.com` | Optional |
+| `SMTP_PORT` | SMTP Email Server Port | `587` | Optional |
+| `SMTP_USER` | SMTP Email Username | `your-email@gmail.com` | Optional |
+| `SMTP_PASS` | SMTP App Password | `your-app-password` | Optional |
+| `GOOGLE_CLIENT_ID` | Google OAuth Client ID | `your-client-id.apps.googleusercontent.com` | Optional |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret | `your-client-secret` | Optional |
+| `GOOGLE_REFRESH_TOKEN` | Google OAuth Refresh Token | `your-refresh-token` | Optional |
+
+---
+
+## 📡 API Endpoint Reference
+
+### Authentication (`/api/auth`)
+- `POST /api/auth/register` — Register a new patient or doctor account.
+- `POST /api/auth/login` — Authenticate and receive JWT token.
+- `GET /api/auth/me` — Retrieve active authenticated user profile.
+
+### Doctors & Availability (`/api/doctors`)
+- `GET /api/doctors` — List all specialists with optional search & specialty filters.
+- `GET /api/doctors/:id/availability?date=YYYY-MM-DD` — Compute real-time slots and leave status.
+
+### Appointments (`/api/appointments`)
+- `POST /api/appointments/hold` — Acquire a 10-minute temporary reservation lock.
+- `DELETE /api/appointments/hold/:token` — Release a temporary slot lock.
+- `POST /api/appointments/book` — Confirm booking with AI symptom triage and calendar sync.
+- `GET /api/appointments` — Fetch patient or doctor appointments.
+- `DELETE /api/appointments/:id` — Cancel an appointment with cancellation notice email.
+- `GET /api/appointments/:id/ics` — Download RFC-5545 universal `.ICS` calendar file.
+- `POST /api/appointments/analyze-symptoms` — Real-time AI symptom evaluation endpoint.
+
+### Consultations (`/api/consultations`)
+- `POST /api/consultations/:id/post-visit` — Save clinical diagnosis, AI care plan, and prescriptions.
+- `GET /api/consultations/medications` — Retrieve active patient medication reminder schedules.
+- `PATCH /api/consultations/medications/:id/toggle` — Enable or disable daily medication alerts.
+
+### Administration (`/api/admin`)
+- `GET /api/admin/analytics` — Platform KPIs (Doctors, Appointments, Patients, Email Deliveries).
+- `POST /api/admin/doctors/:id/leave` — Register doctor leave and trigger automated rescheduling.
+- `GET /api/admin/doctors/:id/leaves` — List all active leave dates for a specialist.
+- `DELETE /api/admin/doctors/:id/leaves/:date` — Remove an approved doctor leave.
+- `GET /api/notifications` — View outbound email dispatch audit logs.
 
 ---
 
 ## 🌐 Production Deployment Guide
 
-### Single-Command Production Build:
-```bash
-npm run build
-npm start
-```
-The Express backend automatically serves the production-bundled React frontend from `/client/dist` on port 5000 (or `process.env.PORT`).
+### Option 1: Monorepo Deployment (Render / Railway)
+1. Link your GitHub repository.
+2. Set the **Build Command**:
+   ```bash
+   npm run install:all && npm run build && npm run seed
+   ```
+3. Set the **Start Command**:
+   ```bash
+   npm start
+   ```
+4. Add your **Environment Variables** in the platform dashboard. The Express backend will serve both the REST API and the bundled React frontend from `/client/dist`.
 
-- **Render / Railway**: Connect the repository, specify Build Command: `npm run install:all && npm run build && npm run seed` and Start Command: `npm start`.
-- **Vercel**: Deploy the `/client` directory with Vite preset and point `VITE_API_URL` to your backend instance.
+### Option 2: Split Deployment (Vercel + Railway/Render)
+1. **Frontend (Vercel)**:
+   - Root Directory: `client`
+   - Framework Preset: `Vite`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Environment Variable: `VITE_API_URL=https://your-backend-api.up.railway.app/api`
+2. **Backend (Railway / Render)**:
+   - Root Directory: `server`
+   - Build Command: `npm install && npm run build && npx prisma db push && npm run seed`
+   - Start Command: `node dist/index.js`
+   - Environment Variable: `CLIENT_URL=https://your-frontend.vercel.app`
+
+---
+
+## 📜 License
+Distributed under the **MIT License**. Created with precision for modern clinical operations.
