@@ -3,112 +3,70 @@ import React from 'react';
 export const CarePulseBackground: React.FC = () => {
   return (
     <div className="carepulse-bg" aria-hidden="true">
+      {/* Ambient Lighting Glows */}
       <div className="bg-glow bg-glow-blue" />
       <div className="bg-glow bg-glow-purple" />
       <div className="bg-glow bg-glow-cyan" />
 
+      {/* Cyber Medical Precision Grid & Dot Matrix */}
       <div className="bg-grid" />
       <div className="bg-dots" />
 
+      {/* Dynamic Animated Clinical ECG Heartbeat Pulse Line */}
       <svg
         className="bg-ecg"
         viewBox="0 0 1600 300"
         preserveAspectRatio="none"
       >
         <path
+          className="ecg-path"
           d="
-            M0 160
-            L180 160
-            L220 160
-            L245 158
-            L265 160
-            L285 160
-            L300 160
-            L315 160
-            L330 160
-            L345 160
-            L360 160
-            L375 160
-            L390 160
-            L405 160
-            L420 160
-            L435 160
-            L450 160
-            L465 160
-            L480 160
-            L495 160
-            L510 160
-            L525 160
-            L540 160
-            L555 160
-            L570 160
-            L585 160
-            L600 160
-            L615 160
-            L630 160
-            L645 160
-            L660 160
-            L675 160
-            L690 160
-            L705 160
-            L720 160
-            L735 160
-            L750 160
-            L765 160
-            L780 160
-            L795 160
-            L810 160
-            L825 160
-            L840 160
-            L855 160
-            L870 160
-            L885 160
-            L900 160
-            L915 160
-            L930 160
-            L945 160
-            L960 160
-            L975 160
-            L990 160
-            L1005 160
-            L1020 160
-            L1035 160
-            L1050 160
-            L1065 160
-            L1080 160
-            L1095 160
-            L1110 160
-            L1125 160
-            L1140 160
-            L1155 160
-            L1170 160
-            L1185 160
-            L1200 160
-            L1215 160
-            L1230 160
-            L1245 160
-            L1260 160
-            L1275 160
-            L1290 160
-            L1305 160
-            L1320 160
-            L1335 160
-            L1350 160
-            L1365 160
-            L1380 160
-            L1395 160
-            L1410 160
-            L1425 160
-            L1440 160
-            L1455 160
-            L1470 160
-            L1485 160
-            L1500 160
-            L1600 160
+            M 0 150
+            L 150 150
+            L 170 145 L 180 150
+            L 200 150
+            L 210 165
+            L 225 30
+            L 240 210
+            L 250 150
+            L 270 150
+            L 290 135 L 310 150
+            L 450 150
+            L 550 150
+            L 570 145 L 580 150
+            L 600 150
+            L 610 165
+            L 625 30
+            L 640 210
+            L 650 150
+            L 670 150
+            L 690 135 L 710 150
+            L 850 150
+            L 950 150
+            L 970 145 L 980 150
+            L 1000 150
+            L 1010 165
+            L 1025 30
+            L 1040 210
+            L 1050 150
+            L 1070 150
+            L 1090 135 L 1110 150
+            L 1250 150
+            L 1350 150
+            L 1370 145 L 1380 150
+            L 1400 150
+            L 1410 165
+            L 1425 30
+            L 1440 210
+            L 1450 150
+            L 1470 150
+            L 1490 135 L 1510 150
+            L 1600 150
           "
         />
       </svg>
 
+      {/* Floating Ambient Bio-Data Particles */}
       <div className="bg-particles">
         <span />
         <span />
@@ -120,6 +78,7 @@ export const CarePulseBackground: React.FC = () => {
         <span />
       </div>
 
+      {/* Soft Depth Vignette */}
       <div className="bg-vignette" />
     </div>
   );
