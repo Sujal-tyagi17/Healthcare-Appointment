@@ -54,7 +54,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  // Quick 1-click demo switcher for evaluators and pair programming
   const switchDemoUser = async (role: UserRole) => {
     setIsLoading(true);
     try {
@@ -67,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err) {
       console.error('Demo switch failed:', err);
+      throw err;
     } finally {
       setIsLoading(false);
     }

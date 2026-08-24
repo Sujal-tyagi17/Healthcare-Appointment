@@ -35,7 +35,7 @@ A full-stack healthcare appointment management platform engineered with modern d
 
 ## 🌐 Live Demo
 
-**Live Application:** [CarePulse](https://carepulse-healthcare.vercel.app)
+**Live Application:** [CarePulse Live Web App](https://carepulse-healthcare-appointment.vercel.app/)
 
 ---
 
@@ -467,7 +467,7 @@ Set the required backend environment variables, including:
 
 ```env
 DATABASE_URL=your-neon-postgresql-connection-string
-CLIENT_URL=https://your-frontend-url
+CLIENT_URL=https://carepulse-healthcare-appointment.vercel.app
 JWT_SECRET=your-secure-jwt-secret
 ```
 

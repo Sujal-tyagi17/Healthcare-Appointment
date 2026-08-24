@@ -42,6 +42,30 @@ export const AuthPage: React.FC = () => {
     }
   };
 
+  const handleQuickLogin = async (demoRole: 'PATIENT' | 'DOCTOR' | 'ADMIN') => {
+    setError(null);
+    setLoading(true);
+    setIsLogin(true);
+    setRole(demoRole);
+    if (demoRole === 'PATIENT') {
+      setEmail('rahul@example.com');
+      setPassword('password123');
+    } else if (demoRole === 'DOCTOR') {
+      setEmail('dr.rajesh@carepulse.com');
+      setPassword('doctor123');
+    } else if (demoRole === 'ADMIN') {
+      setEmail('admin@carepulse.com');
+      setPassword('admin123');
+    }
+    try {
+      await switchDemoUser(demoRole);
+    } catch (err: any) {
+      setError(err.message || 'Cannot reach backend API. Make sure VITE_API_URL is configured in your Vercel project settings.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row selection:bg-primary/30 selection:text-primary text-on-surface relative overflow-x-hidden">
       {/* Background Fluid Shader */}
@@ -440,8 +464,9 @@ export const AuthPage: React.FC = () => {
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => switchDemoUser('PATIENT')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-primary/40 transition-all group shadow-sm"
+                onClick={() => handleQuickLogin('PATIENT')}
+                disabled={loading}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-primary/40 transition-all group shadow-sm disabled:opacity-60"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-105 transition-transform">
@@ -461,8 +486,9 @@ export const AuthPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => switchDemoUser('DOCTOR')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-secondary/40 transition-all group shadow-sm"
+                onClick={() => handleQuickLogin('DOCTOR')}
+                disabled={loading}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-secondary/40 transition-all group shadow-sm disabled:opacity-60"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-secondary/15 flex items-center justify-center text-secondary border border-secondary/20 group-hover:scale-105 transition-transform">
@@ -482,8 +508,9 @@ export const AuthPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => switchDemoUser('ADMIN')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-tertiary/40 transition-all group shadow-sm"
+                onClick={() => handleQuickLogin('ADMIN')}
+                disabled={loading}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-outline-variant bg-surface-container hover:bg-surface-container-high hover:border-tertiary/40 transition-all group shadow-sm disabled:opacity-60"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-tertiary/15 flex items-center justify-center text-tertiary border border-tertiary/20 group-hover:scale-105 transition-transform">
