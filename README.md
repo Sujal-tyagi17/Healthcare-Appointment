@@ -5,6 +5,8 @@
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Neon](https://img.shields.io/badge/Neon_Postgres-00E599?style=for-the-badge&logo=neon&logoColor=black)](https://neon.tech/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
@@ -15,13 +17,16 @@ A full-stack healthcare appointment management platform engineered with modern d
 
 ## 🖥️ Application Preview
 
-### Patient Portal
+### 🔐 Authentication & Portal Access
+![Auth & Landing Page](docs/screenshots/auth-landing.png)
+
+### 👤 Patient Portal — Specialist Discovery & Slot Booking
 ![Patient Dashboard](docs/screenshots/patient-dashboard.png)
 
-### Doctor Clinical Station
+### 🩺 Doctor Clinical Station — AI Pre-Visit Brief & Patient Queue
 ![Doctor Dashboard](docs/screenshots/doctor-dashboard.png)
 
-### Clinic Administration
+### 👑 Clinic Administration — Telemetry & Schedule Management
 ![Admin Dashboard](docs/screenshots/admin-dashboard.png)
 
 ## 🌐 Live Demo
@@ -56,7 +61,7 @@ A full-stack healthcare appointment management platform engineered with modern d
 ### Backend & Database
 - **Runtime**: Node.js (v18+) with Express.js REST API.
 - **Language**: TypeScript (compiled with `tsc`).
-- **ORM & Database**: Prisma ORM with SQLite (portable zero-config) and native PostgreSQL support.
+- **ORM & Database**: Prisma ORM with **Neon Cloud PostgreSQL** (serverless auto-scaling PostgreSQL with zero project pausing).
 - **Security & Validation**: JSON Web Tokens (`jsonwebtoken`), `bcryptjs` password hashing, and `Zod` request body validation.
 
 ### Artificial Intelligence & Clinical Intelligence
@@ -212,6 +217,8 @@ cp .env.example server/.env
 
 ### 4. Initialize & Seed Database
 ```bash
+# Push Prisma schema to Neon PostgreSQL and seed test specialists & patients
+npx prisma db push
 npm run seed
 ```
 
@@ -230,7 +237,7 @@ npm run dev
 |---|---|---|---|
 | `PORT` | Backend HTTP Port | `5000` | No |
 | `NODE_ENV` | Environment Mode | `development` / `production` | No |
-| `DATABASE_URL` | Database Connection String | `file:./dev.db` | Yes |
+| `DATABASE_URL` | Neon PostgreSQL Connection String | `postgresql://neondb_owner:***@ep-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require` | Yes |
 | `JWT_SECRET` | Secret Key for JWT Tokens | `your-secure-jwt-secret` | Yes |
 | `CLIENT_URL` | Frontend URL for CORS | `http://localhost:5173` | Yes |
 | `GEMINI_API_KEY` | Google Gemini API Key | `your-gemini-api-key` | Optional (Fallback Active) |
