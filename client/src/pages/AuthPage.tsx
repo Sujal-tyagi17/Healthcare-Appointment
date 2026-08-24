@@ -43,7 +43,7 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row selection:bg-primary/30 selection:text-primary bg-background text-on-surface relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row selection:bg-primary/30 selection:text-primary text-on-surface relative overflow-x-hidden">
       {/* Background Fluid Shader */}
       <FluidShaderCanvas />
 
